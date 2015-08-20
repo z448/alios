@@ -15,7 +15,7 @@
 #Now marked UUIDsare being tracked, in case you want to add more marks make sure you run "alios -f" afterwards, it will make fresh check
 #moved from ~ to ~/bin
 
-fileOut=$HOME/bin/alios
+fileOut="$HOME/.alios"
 dataPath=/var/mobile/Containers/Data/Application
 docDir=Documents
 vnames=''
