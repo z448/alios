@@ -21,7 +21,7 @@ docDir=Documents
 vnames=''
 
 function rcapend { 
-		echo '~bin/alios && . ~/.alios' >> $HOME/.bashrc #'save state into into rc for next run
+		echo '~/bin/alios && . ~/.alios' >> $HOME/.bashrc #'save state into into rc for next run
 	    printf "\nready\n" && return
 }
 
@@ -65,7 +65,7 @@ function uuidCheck {
 
 function rccheck {    
 	isinrc=$(cat $HOME/.bashrc |grep .alios)
-	if [ "$isinrc" == '~bin/alios && . ~/.alios' ]; then
+	if [ "$isinrc" == '~/bin/alios && . ~/.alios' ]; then
 		printf "\nready\n" && return
 	else rcapend
 	fi
