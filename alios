@@ -7,20 +7,21 @@
 #Will work even after backup/restore as marks are backed up in iCloud  
 
    ##################### usage ###
-   ## 0.  create your name.ME   ##
-   ## 1.  ~/alios   		##
-   ## 2.  name 			##     
+   ## 0.  create your <name>.ME ##
+   ## 1.  alios   		        ##
+   ## 2.  <name> 	    		##     
    ###############################				        
 
 #Now marked UUIDsare being tracked, in case you want to add more marks make sure you run "alios -f" afterwards, it will make fresh check
+#moved from ~ to ~/bin
 
-fileOut=$HOME/.alios
+fileOut=$HOME/bin/alios
 dataPath=/var/mobile/Containers/Data/Application
 docDir=Documents
 vnames=''
 
 function rcapend { 
-		echo '~/alios && . ~/.alios' >> $HOME/.bashrc #'save state into into rc for next run
+		echo '~bin/alios && . ~/.alios' >> $HOME/.bashrc #'save state into into rc for next run
 	    printf "\nready\n" && return
 }
 
@@ -64,7 +65,7 @@ function uuidCheck {
 
 function rccheck {    
 	isinrc=$(cat $HOME/.bashrc |grep .alios)
-	if [ "$isinrc" == '~/alios && . ~/.alios' ]; then
+	if [ "$isinrc" == '~bin/alios && . ~/.alios' ]; then
 		printf "\nready\n" && return
 	else rcapend
 	fi
@@ -72,7 +73,7 @@ function rccheck {
 function adios {
     sed '/alios/d' /var/mobile/.bashrc > /var/mobile/.bashrc.tmp
     mv /var/mobile/.bashrc.tmp /var/mobile/.bashrc
-    rm /var/mobile/alios && rm /var/mobile/.alios && rm /var/mobile/.bashrc.tmp
+    rm /var/mobilebin/alios && rm /var/mobile/.alios && rm /var/mobile/.bashrc.tmp
     chown mobile:wheel /var/mobile/.bashrc
     echo 'adios'
 }
