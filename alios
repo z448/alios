@@ -7,26 +7,25 @@
 #Will work even after backup/restore as marks are backed up in iCloud  
 
    ##################### usage ###
-   ## 0.  create your <name>.ME ##
-   ## 1.  alios   		        ##
-   ## 2.  <name> 	    		##     
+   ## 0.  create your name.ME   ##
+   ## 1.  alios   		##
+   ## 2.  name 			##     
    ###############################				        
 
 #Now marked UUIDsare being tracked, in case you want to add more marks make sure you run "alios -f" afterwards, it will make fresh check
-#moved from ~ to ~/bin
 
-fileOut="$HOME/.alios"
+fileOut=$HOME/Documents/.alios
 dataPath=/var/mobile/Containers/Data/Application
 docDir=Documents
 vnames=''
 
 function rcapend { 
-		echo '~/bin/alios && . ~/.alios' >> $HOME/.bashrc #'save state into into rc for next run
-	    printf "\nready\n" && return
+		echo '/usr/bin/alios && . ~/Documents/.alios' >> $HOME/.bashrc #'save state into into rc for next run
+	    	return
 }
 
 function alios {
-    echo 'setting..'
+    echo -n 'setting..'
     if  [ -f "$fileOut" ]; then rm "$fileOut" && touch "$fileOut"
     else
         touch $fileOut
@@ -42,10 +41,11 @@ function alios {
 				appName=${appNameMe%$suffix}
 	   			echo "$appName=$appDataUUIDPATH/$docDir" >> $fileOut
 				echo "alias $appName='cd $appDataUUIDPATH/$docDir'" >> $fileOut
-				echo -n "$appName "
-			else echo 'no .ME files found, setup your marks first by creating name.ME file in app Documents directory'	
+				echo -n '.'
+				#echo -n "$appName "
 			fi
-			done
+	done
+	uuidCheck 
 	rccheck
 }
 
@@ -59,29 +59,19 @@ function uuidCheck {
         	alios
 	    fi
     done
+#	echo $(cat $fileOut)
+	appName=${appNameMe%$suffix}
     printf "\n>>$vnames"
     rccheck
 }
 
 function rccheck {    
 	isinrc=$(cat $HOME/.bashrc |grep .alios)
-	if [ "$isinrc" == '~/bin/alios && . ~/.alios' ]; then
-		printf "\nready\n" && return
+	if [ "$isinrc" == '/usr/bin/alios && . ~/Documents/.alios' ]; then
+		return
 	else rcapend
 	fi
 }
-function adios {
-    sed '/alios/d' /var/mobile/.bashrc > /var/mobile/.bashrc.tmp
-    mv /var/mobile/.bashrc.tmp /var/mobile/.bashrc
-    rm /var/mobilebin/alios && rm /var/mobile/.alios && rm /var/mobile/.bashrc.tmp
-    chown mobile:wheel /var/mobile/.bashrc
-    echo 'adios'
-}
-
-if [ "$1" == '-adios' ]; then
-    adios
-    exit
-fi
 
 if [ "$1" == "" ]; then 
 	if [ ! -f "$fileOut" ]; then
@@ -90,4 +80,4 @@ if [ "$1" == "" ]; then
 	fi
 else alios
 fi
-exit 
+printf "\nready\n"
