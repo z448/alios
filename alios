@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# not working for icloud new dir
 #ios7+ 
 #Like alias + keeps track of changing UUIDs directory namesand updates path for alias when there is any change in path.
 #First set up your mark ( use iFile, Filza.. ) by creating empty file 'somename.ME' in Documents folder of apps you want to access by alias (/var/mobile/Containers/Data/Application/<UUID>/Documents) and run 'alios && bash'
