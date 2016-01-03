@@ -4,7 +4,7 @@
 Works after backup/restore as config is written into sanboxed UUID app directory therefore is backed up along with app contents. This ver. doesnt have dependency 
 on plutil.
 
-**Put in your `~/.bash_profile` file*
+**Add to your `~/.bash_profile` file**
 
 `. ~/.alios`
 
