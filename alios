@@ -1,85 +1,97 @@
 #!/bin/bash
 
-#ios7+ 
-#Like alias + keeps track of changing UUIDs directory names and updates path for alias when there is any change in path.
-#First set up your mark ( use iFile, Filza.. ) by creating empty file 'somename.als' in Documents folder of apps you want to access by alias (/var/mobile/Containers/Data/Application/<UUID>/Documents) and run 'alios && bash'
-#Now you can jump through UUIDs just by typing 'somename'
-#Will work even after backup/restore as marks are backed up in iCloud  
+#alios -s 3 sls
 
-   ##################### usage #############
-   ## 0.  create your name.als  
-   ## 1.  alios   		
-   ## 2.  logout/login	     
-   ## 3.  name - will get you behind uuid
-   #########################################				        
+BASES=(/var/mobile/Containers/Data/Application /var/mobile/Containers/Shared/AppGroup)
+declare -a BASE
+BASE=$(for i in ${BASES[*]};do ls $i;done)
+plist=".com.apple.mobile_container_manager.metadata.plist"
+exec > >(tee $HOME/alios.log)
 
-#Now marked UUIDsare being tracked, in case you want to add more marks make sure you run "alios -f" afterwards, it will make fresh check
+high () {
+     echo -ne "\e[38;5;8m|______________\e[0m"
+     echo -ne "\e[48;5;15m\e[38;5;0m  UUIDs \e[0m"
+     echo -e "\e[38;5;8m_____________|\e[0m"
+ }
 
-fileOut=$HOME/Documents/.alios
-dataPath=/var/mobile/Containers/Shared/AppGroup
-#docDir=Storage
-vnames=''
-
-function rcapend { 
-		echo '/usr/bin/alios && . ~/Documents/.alios' >> $HOME/.bashrc #'save state into into rc for next run
-	    	return
-}
-
-function alios {
-    echo -n 'setting..'
-    if  [ -f "$fileOut" ]; then rm -f "$fileOut" && touch "$fileOut"
-    else
-        touch $fileOut
-    fi
-
-	for j in $(ls -A $dataPath)
-	do
-       	appDataUUID=$j
-       	appDataUUIDPATH="$dataPath/$appDataUUID"
-		appNameMe=$(ls -A $appDataUUIDPATH | grep -F '.als')
-			if [ "$appNameMe" ]; then	
-				suffix=".als"	
-				appName=${appNameMe%$suffix}
-				export appName=${appNameMe%$suffix}
-	   			echo "$appName=$appDataUUIDPATH" >> $fileOut
-				echo "alias $appName='cd $appDataUUIDPATH'" >> $fileOut
-				echo -n '.'
-				#echo -n "$appName "
-			fi
-	done
-	uuidCheck 
-	rccheck
-}
-
-function uuidCheck {
-    for i in $(cat "$fileOut" | grep -v 'alias')
+check (){
+    echo " " > $HOME/.alios.set
+    echo " " > $HOME/.alios.see
+    for path in ${BASES[*]}
     do
-	    dpath=${i#*=}
-	    vname=${i%%=*}
-	    vnames="$vnames $vname"
-	    if [ ! -d "$dpath" ]; then
-        	alios
-	    fi
+        for uuid_ in ${BASE[*]}
+        do
+            let "i++"
+            if [ -f "$path/$uuid_/$plist" ];then
+                mmid=$(strings -t o "$path/$uuid_/$plist" | grep '174\|175\|152\|153' | grep -F "."  )
+                m=${mmid%_*}
+                m=${m#* }
+                mid=${m%*_}
+                dis=${m##*.}
+                openapid=${mid#group.*}
+                #echo -ne "\e[90m $uuid_=$openapid\e[43m\e[30m $dis\e[100m\e[7m_\e[43m$i\e[0m\n"|grep -F '.' >> ~/.alios.see
+                echo -e "\e[90m $uuid_=$openapid\e[43m\e[30m $dis\e[100m\e[7m_\e[43m$i\e[0m"|grep -F '.'
+
+                echo -e ALIOS[$i]="'$path/$uuid_'" >> ~/.alios.set 
+                echo -e ALIOPN[$i]="'$openapid'" >> ~/.alios.set
+            fi
+        done
     done
-#	echo $(cat $fileOut)
-	appName=${appNameMe%$suffix}
-    printf "\n>>$vnames"
-    rccheck
+    high
 }
 
-function rccheck {    
-	isinrc=$(cat $HOME/.bashrc |grep -F '.alios')
-	if [ "$isinrc" == '/usr/bin/alios && . ~/Documents/.alios' ]; then
-		return
-	else rcapend
-	fi
+hook () {
+    echo -e "\e[90m APPS<->UUIDs mapping\e[0m"
+    echo -en "\e[43m$""${3^^}\e[0m exported " | tee  ~/.alios.see
+    echo -en "\e[43m$""$3\e[0m exported " | tee  ~/.alios.see
+    echo -e "\e[43m$3\e[0m alias created " | tee  ~/.alios.see
+    echo -e "\e[90m restart session to apply changes\e[0m\n\n"
+
+    source $apids
+    echo  'export '$3=${ALIOPN[$2]} >> $HOME/.alios 
+    echo -e 'alias '$3=\'cd ${ALIOS[$2]}\' >> $HOME/.alios
+    echo 'export '${3^^}=${ALIOS[$2]} >> $HOME/.alios
 }
 
-if [ "$1" == "" ]; then 
-	if [ ! -f "$fileOut" ]; then
-		alios
-		else uuidCheck
-	fi
-else alios
+see () {
+    echo $(cat $current)
+}
+
+write () {
+    if [ -f $w_base/$uid/$plist ];then
+            echo -e "\n\e[48;5;15m\e[38;5;0mMatch on path\e[0m"
+
+            if [[ "$3" == "--set" ]];then
+                echo -e "$4=$w_base/$uid" >> ~/.alios
+                echo -e "alias $4='cd $w_base/$uid'" >> ~/.alios
+                if [ -f ${BASES[1]}/$uid/.$4.als ];then rm ${BASES[1]}/$uid/.$4.als;fi
+                echo -e "$4=$w_base/$uid" >> ${BASES[1]}/$uid/.$4.als
+                echo -e "\n\e[48;5;1m\e[38;5;0m \$_$4_ \e[0m and \e[48;5;1m\e[38;5;0m alias $4 \e[0m has been set to:"
+            fi
+
+        echo $set_base
+        echo -e "\n\e[48;5;15m\e[38;5;0mRetrieved strings\e[0m\n"
+        share_strings=$(strings -o "$w_base/$plist")
+        echo -e "$share_strings"
+        my_string=$(echo "$share_strings" |grep -F 'com.')
+        echo  $my_string
+    fi
+}
+
+if [[ -z $1 ]];then 
+    current=$HOME/.alios.see
+    see $current
+    exit
 fi
-printf "\nready\n"
+if [[ "$1" == "-m" ]];then
+    apids=$HOME/.alios.set
+    source $apids 
+    hook $apids $2 $3
+    exit
+elif [[ "$1" == "-a" ]];then 
+    set_base=${BASES[*]}
+    check
+    exit
+else
+    exit
+fi
