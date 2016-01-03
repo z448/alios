@@ -23,5 +23,5 @@ Restart shell session
 Now you can access UUID folder with choosen `someName` alias. Your scripts can use exported variable `$SOMENAME`, just source ~/.alios within your script. Also variable `$someName` 
 can be used with cli apps that require DisplayID; for example to open safari you type `open $safari`
 
-![alios](https://raw.githubusercontent.com/z448/pm2deb/master/docs/control.gif)
+![alios](https://raw.githubusercontent.com/z448/alios/master/alios.gif)
 
