@@ -1,6 +1,6 @@
 #### alios
 
-**CLI tool** for ios to map custom alias name -> UUID directory, then keeps track of any changes in **UUID** and rewrite path so choosen alias name stays updated.
+**CLI tool** writen in bash for ios to map custom alias name to UUID directory, then keeps track of any changes in **UUID** and rewrite path so choosen alias name stays updated.
 Works after backup/restore as config is written into sanboxed UUID app directory therefore is backed up along with app contents. This ver. doesnt have dependency 
 on plutil.
 
