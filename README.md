@@ -12,7 +12,7 @@ on plutil.
 
 `alios -a`
 
-Highlighted names are optional, you can choose custom ass well. Map alios using `-m` option with number beside app name.
+Highlighted names are optional, you can choose custom as well. Map alios using `-m` option with number beside app name.
 
 `alios -m 123 someName`
 
