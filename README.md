@@ -20,7 +20,7 @@ Restart session
 `bash -l`
 
 Now you can access UUID folder with choosen `someName` alias. Your scripts can use variable `$SOMENAME`, just source ~/.alios within your script. Also variable `$someName` 
-can be used with cli apps that require DisplayID; for example to open safari you type `open $safari`
+can be used with cli apps that require DisplayID; for example to open Safari you type `open $safari`
 
 ![alios](https://raw.githubusercontent.com/z448/alios/master/alios.gif)
 
