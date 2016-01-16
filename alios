@@ -2,6 +2,7 @@
 
 #alios -s 3 sls
 
+alios_conf="/var/mobile/.alios"
 BASES=(/var/mobile/Containers/Data/Application /var/mobile/Containers/Shared/AppGroup)
 declare -a BASE
 BASE=$(for i in ${BASES[*]};do ls $i;done)
@@ -14,7 +15,39 @@ high () {
      echo -e "\e[38;5;8m_____________|\e[0m"
  }
 
-check (){
+check () {
+    source /var/mobile/.alios
+    for set_uuid in `cat /var/mobile/.alios |grep -v -e 'export' -e 'alias'`
+    do
+       echo '$set_uuid is '$set_uuid
+       dpath=${set_uuid#*=}
+       echo '$dpath is '$dpath
+       vname=${set_uuid%%=*}
+       echo '$vname: '$vname
+       vnames="$vnames $vname"
+       if [ ! -d "$dpath" ]; then
+           echo '$dpath '$dpath' doesnt exist'
+       fi
+       rm -r /var/mobile/.alios && touch /var/mobile/.alios
+
+    for new_path in ${BASES[*]}
+    do
+           for new_uuid in ${BASE[*]}
+           do
+               new_vname=$new_path/$new_uuid/${vname,,}'.als'
+               if [[ -f "$new_vname" ]]; then
+                   ls -A $new_path/$new_uuid | grep -F '.als'
+                   repath=${new_vname#*=}
+                   echo 'export' ${vname,,}=$new_path/$new_uuid >> $HOME/.alios 
+                   echo -e 'alias '${vname,,}=\'cd $new_path/$new_uuid\' >> $HOME/.alios
+                   echo ${vname^^}=$new_path/$new_uuid >> $HOME/.alios
+                fi
+            done
+        done
+    done
+ }
+
+iter () {
     echo " " > $HOME/.alios.set
     echo " " > $HOME/.alios.see
     for path in ${BASES[*]}
@@ -50,7 +83,7 @@ hook () {
     source $apids
     echo  'export '$3=${ALIOPN[$2]} >> $HOME/.alios 
     echo -e 'alias '$3=\'cd ${ALIOS[$2]}\' >> $HOME/.alios
-    echo 'export '${3^^}=${ALIOS[$2]} >> $HOME/.alios
+    echo ${3^^}=${ALIOS[$2]} >> $HOME/.alios
 }
 
 see () {
@@ -88,9 +121,16 @@ if [[ "$1" == "-m" ]];then
     source $apids 
     hook $apids $2 $3
     exit
-elif [[ "$1" == "-a" ]];then 
+elif [[ "$1" == "-c" ]];then 
     set_base=${BASES[*]}
     check
+    exit
+elif [[ "$1" == "-a" ]];then 
+    set_base=${BASES[*]}
+    iter
+    exit
+elif [[ "$1" == "-d" ]];then 
+    rm -rf "/var/mobile/.alios"
     exit
 else
     exit
