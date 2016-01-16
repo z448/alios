@@ -1,7 +1,6 @@
 #!/bin/bash
 
 #alios -s 3 sls
-
 alios_conf="/var/mobile/.alios"
 BASES=(/var/mobile/Containers/Data/Application /var/mobile/Containers/Shared/AppGroup)
 declare -a BASE
@@ -28,7 +27,6 @@ check () {
        if [ ! -d "$dpath" ]; then
            echo '$dpath '$dpath' doesnt exist'
        fi
-       rm -r /var/mobile/.alios && touch /var/mobile/.alios
 
     for new_path in ${BASES[*]}
     do
@@ -48,6 +46,7 @@ check () {
  }
 
 iter () {
+   # rm -r /var/mobile/.alios && touch /var/mobile/.alios
     echo " " > $HOME/.alios.set
     echo " " > $HOME/.alios.see
     for path in ${BASES[*]}
@@ -64,7 +63,6 @@ iter () {
                 openapid=${mid#group.*}
                 #echo -ne "\e[90m $uuid_=$openapid\e[43m\e[30m $dis\e[100m\e[7m_\e[43m$i\e[0m\n"|grep -F '.' >> ~/.alios.see
                 echo -e "\e[90m $uuid_=$openapid\e[43m\e[30m $dis\e[100m\e[7m_\e[43m$i\e[0m"|grep -F '.'
-
                 echo -e ALIOS[$i]="'$path/$uuid_'" >> ~/.alios.set 
                 echo -e ALIOPN[$i]="'$openapid'" >> ~/.alios.set
             fi
