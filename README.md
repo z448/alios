@@ -11,9 +11,12 @@ Place alios in $PATH and run with `-a` to do initial chceck.
 
 `alios -a`
 
-Highlighted names are optional, you can choose custom as well. Map alios using `-m` option with number beside app name.
+Highlighted names are optional, you can choose custom as well. Map alios using `-m` option with number beside app name, then source ~/.alios.
 
 `alios -m 123 someName`
+
+- to delete all mappings
+`alios -d`
 
 Restart session
 
