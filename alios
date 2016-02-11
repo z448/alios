@@ -2,13 +2,15 @@
 
 paths=();
 export_line=();
-cache=~/.cache_alios;
+cache=~/.alios.cache
+conf=~/.alios
 groupid="group"
 
 paths=( /var/mobile/Containers/Data/Application/*/Library/Preferences\
         /var/mobile/Containers/Shared/AppGroup/*/Library/Preferences    )
 
 function check_plist {
+    echo '' > $cache
     let z=0;     
     for i in ${paths[*]}
     do 
@@ -27,7 +29,7 @@ function check_plist {
                 uuid=${path%%/Library*}; uuid=${uuid##*/};
                 #echo -e "\e[1m$app: \e[1m$uuid\e[0m \e[39m$name\e\_\e[30m\e[7m\e[33m $z\e[0m";
                 echo -ne "\e[39m$name\e\_\e[30m\e[7m\e[33m $z\e[0m\n";
-                echo  'path'$z=$subpath$uuid >> $cache; echo 'open'$z=$name >> $cache;
+                echo app[$z]="$subpath$uuid" >> $cache
                 let "z++";
             done
         done
@@ -35,7 +37,12 @@ function check_plist {
 
 function map_plist {
    source -- "$cache"
-   #echo  'alias 'app$2'='\'cd "${ap["$3"'path']}"\'
+   source "$cache"
+   echo one$1two$2thre$3
+   setappname=$2
+   request=$1
+   echo -n "alias $2='cd ${app[$request]}'" > $conf
+
    #echo  "${2^^}=${ap["$3"'path']}"
    #echo  "${2}=${ap["$3"'open']}"
 }
@@ -44,7 +51,7 @@ function map_plist {
 if [ "$1" = "plist" ]; then
     paths=("$2") && check_plist && exit;
 elif [ "$1" = "-m" ]; then
-   source ~/.alioscache;
+ #  source ~/.cache_alios;
     map_plist $2 $3 
 else
     check_plist;
