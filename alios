@@ -1,135 +1,58 @@
 #!/bin/bash
 
-#alios -s 3 sls
-alios_conf="/var/mobile/.alios"
-BASES=(/var/mobile/Containers/Data/Application /var/mobile/Containers/Shared/AppGroup)
-declare -a BASE
-BASE=$(for i in ${BASES[*]};do ls $i;done)
-plist=".com.apple.mobile_container_manager.metadata.plist"
-exec > >(tee $HOME/alios.log)
+paths=();
+export_line=();
+declare -A ap;
+cache=~/.cache.als;
 
-high () {
-     echo -ne "\e[38;5;8m|______________\e[0m"
-     echo -ne "\e[48;5;15m\e[38;5;0m  UUIDs \e[0m"
-     echo -e "\e[38;5;8m_____________|\e[0m"
- }
+paths=( /var/mobile/Containers/Data/Application/*/Library/Preferences\
+        /var/mobile/Containers/Shared/AppGroup/*/Library/Preferences    )
+groupid="group"
 
-check () {
-    source /var/mobile/.alios
-    for set_uuid in `cat /var/mobile/.alios |grep -v -e 'export' -e 'alias'`
-    do
-       echo '$set_uuid is '$set_uuid
-       dpath=${set_uuid#*=}
-       echo '$dpath is '$dpath
-       vname=${set_uuid%%=*}
-       echo '$vname: '$vname
-       vnames="$vnames $vname"
-       if [ ! -d "$dpath" ]; then
-           echo '$dpath '$dpath' doesnt exist'
-       fi
-
-    for new_path in ${BASES[*]}
-    do
-           for new_uuid in ${BASE[*]}
-           do
-               new_vname=$new_path/$new_uuid/${vname,,}'.als'
-               if [[ -f "$new_vname" ]]; then
-                   ls -A $new_path/$new_uuid | grep -F '.als'
-                   repath=${new_vname#*=}
-                   echo 'export' ${vname,,}=$new_path/$new_uuid >> $HOME/.alios 
-                   echo -e 'alias '${vname,,}=\'cd $new_path/$new_uuid\' >> $HOME/.alios
-                   echo ${vname^^}=$new_path/$new_uuid >> $HOME/.alios
-                fi
+function check_plist {
+    let z=0;
+    for i in ${paths[*]}
+    do 
+        for j in $(find $i | grep -i plist)
+        do
+            appName=${j##*/}
+            if [[ $appName == *"$groupid"* ]];then
+                app=${j##*/group.}; app=${app%*.plist};
+                subpath="/var/mobile/Containers/Shared/AppGroup/";
+            else
+                app=${j##*/}; app=${app%*.plist}; 
+                subpath="/var/mobile/Containers/Data/Application/";
+            fi
+                path=$j; 
+                name=${app##*.}; 
+                uuid=${path%%/Library*}; uuid=${uuid##*/};
+                echo -e "\e[1m$app: \e[1m$uuid\e[0m \e[39m$name\e\_\e[30m\e[7m\e[33m $z\e[0m";
+                ap[$id'path']="$subpath$uuid"
+                ap[$id'open']="$app"
+                ap[$id'plist']="$path"
+                ap[$id'nr']="$z"
+                let "z++";
+                declare -p ap >> "$cache"
             done
         done
-    done
- }
+    }
 
-iter () {
-   # rm -r /var/mobile/.alios && touch /var/mobile/.alios
-    echo " " > $HOME/.alios.set
-    echo " " > $HOME/.alios.see
-    for path in ${BASES[*]}
-    do
-        for uuid_ in ${BASE[*]}
-        do
-            let "i++"
-            if [ -f "$path/$uuid_/$plist" ];then
-                mmid=$(strings -t o "$path/$uuid_/$plist" | grep '174\|175\|152\|153' | grep -F "."  )
-                m=${mmid%_*}
-                m=${m#* }
-                mid=${m%*_}
-                dis=${m##*.}
-                openapid=${mid#group.*}
-                #echo -ne "\e[90m $uuid_=$openapid\e[43m\e[30m $dis\e[100m\e[7m_\e[43m$i\e[0m\n"|grep -F '.' >> ~/.alios.see
-                echo -e "\e[90m $uuid_=$openapid\e[43m\e[30m $dis\e[100m\e[7m_\e[43m$i\e[0m"|grep -F '.'
-                echo -e ALIOS[$i]="'$path/$uuid_'" >> ~/.alios.set 
-                echo -e ALIOPN[$i]="'$openapid'" >> ~/.alios.set
-            fi
-        done
-    done
-    high
+function map_plist {
+   source -- "$cache"
+   echo -n 'alias '$2'='"${ap_["$1"]}"
+   echo -n $2=
+   echo -e 
 }
 
-hook () {
-    echo -e "\e[90m APPS<->UUIDs mapping\e[0m"
-    echo -en "\e[43m$""${3^^}\e[0m exported " | tee  ~/.alios.see
-    echo -en "\e[43m$""$3\e[0m exported " | tee  ~/.alios.see
-    echo -e "\e[43m$3\e[0m alias created " | tee  ~/.alios.see
-    echo -e "\e[90m restart session to apply changes\e[0m\n\n"
 
-    source $apids
-    echo  'export '$3=${ALIOPN[$2]} >> $HOME/.alios 
-    echo -e 'alias '$3=\'cd ${ALIOS[$2]}\' >> $HOME/.alios
-    echo ${3^^}=${ALIOS[$2]} >> $HOME/.alios
-}
-
-see () {
-    echo $(cat $current)
-}
-
-write () {
-    if [ -f $w_base/$uid/$plist ];then
-            echo -e "\n\e[48;5;15m\e[38;5;0mMatch on path\e[0m"
-
-            if [[ "$3" == "--set" ]];then
-                echo -e "$4=$w_base/$uid" >> ~/.alios
-                echo -e "alias $4='cd $w_base/$uid'" >> ~/.alios
-                if [ -f ${BASES[1]}/$uid/.$4.als ];then rm ${BASES[1]}/$uid/.$4.als;fi
-                echo -e "$4=$w_base/$uid" >> ${BASES[1]}/$uid/.$4.als
-                echo -e "\n\e[48;5;1m\e[38;5;0m \$_$4_ \e[0m and \e[48;5;1m\e[38;5;0m alias $4 \e[0m has been set to:"
-            fi
-
-        echo $set_base
-        echo -e "\n\e[48;5;15m\e[38;5;0mRetrieved strings\e[0m\n"
-        share_strings=$(strings -o "$w_base/$plist")
-        echo -e "$share_strings"
-        my_string=$(echo "$share_strings" |grep -F 'com.')
-        echo  $my_string
-    fi
-}
-
-if [[ -z $1 ]];then 
-    current=$HOME/.alios.see
-    see $current
-    exit
-fi
-if [[ "$1" == "-m" ]];then
-    apids=$HOME/.alios.set
-    source $apids 
-    hook $apids $2 $3
-    exit
-elif [[ "$1" == "-c" ]];then 
-    set_base=${BASES[*]}
-    check
-    exit
-elif [[ "$1" == "-a" ]];then 
-    set_base=${BASES[*]}
-    iter
-    exit
-elif [[ "$1" == "-d" ]];then 
-    rm -rf "/var/mobile/.alios"
-    exit
+if [ "$1" = "plist" ]; then
+    paths=("$2") && check_plist && exit;
+elif [ "$1" = "-m" ]; then
+   source ~/.alioscache;
+    map_plist $2 $3 
 else
-    exit
+    check_plist;
+#    printf "%s\n" "${cache_apps[@]}" > ~/.alioscache
+    printf "%`tput cols`s"|tr ' ' '_'
 fi
+
