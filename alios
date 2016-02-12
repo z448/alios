@@ -30,6 +30,8 @@ function check_plist {
                 #echo -e "\e[1m$app: \e[1m$uuid\e[0m \e[39m$name\e\_\e[30m\e[7m\e[33m $z\e[0m";
                 echo -ne "\e[39m$name\e\_\e[30m\e[7m\e[33m $z\e[0m\n";
                 echo app[$z]="$subpath$uuid" >> $cache
+                echo open[$z]="'$app'" >> $cache
+                #echo app[$z]="$subpath$uuid" >> $cache
                 let "z++";
             done
         done
@@ -38,13 +40,11 @@ function check_plist {
 function map_plist {
    source -- "$cache"
    source "$cache"
-   echo one$1two$2thre$3
+   #echo one$1two$2thre$3
    setappname=$2
    request=$1
-   echo -n "alias $2='cd ${app[$request]}'" > $conf
-
-   #echo  "${2^^}=${ap["$3"'path']}"
-   #echo  "${2}=${ap["$3"'open']}"
+   echo -ne "alias $2='cd ${app[$request]}'\n${2^^}=${app[$request]}\n$2=${open[$request]}" >> $conf
+   #echo -n "alias $2='cd ${app[$request]}' ${2^^}=${app[$request]} $2=$app[]" > $conf
 }
 
 
