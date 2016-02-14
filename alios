@@ -62,15 +62,16 @@ function delete_alios {
    }
 
 function current_settings {
+#   printf "%`tput cols`s"|tr ' ' '-'
+   echo -ne "\e[43m\e[30m alios \e[7m "
    while read line           
    do           
        if [[ $line == "alias"* ]];then
        saved=${line%=*}; 
-       echo ${saved#alias }
-       #echo -n ${line%=*} \|" "
+       echo -ne ${saved#alias }" "
    fi
    done < $conf
-   echo ''
+   echo -e "\e[0m\e[43m\e[30m \e[0m"
    }
 
 if [ "$1" = "-s" ]; then
