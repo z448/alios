@@ -7,6 +7,7 @@ tmp=~/.alios.tmp
 conf=~/.alios
 conf2="$HOME/.alios"
 groupid="group"
+me=alios
 
 paths=( /var/mobile/Containers/Data/Application/*/Library/Preferences\
         /var/mobile/Containers/Shared/AppGroup/*/Library/Preferences    )
@@ -46,6 +47,7 @@ function map_plist {
    #setappname=$2
    request=$1
    echo -ne "alias $2='cd ${app[$request]}'""\n${2^^}=${app[$request]}\n${2}=${open[$request]}\n" >> $conf
+   $me
 }
 
 function delete_alios {
@@ -54,11 +56,12 @@ function delete_alios {
    while read line           
    do           
        if [[ $line == *"$1"'='* ]] || [[ $line == "$request"'='* ]];then
-       echo deleting: $line
+       echo -ne ''
    else echo $line >> $tmp
    fi
    done < $conf
    mv $tmp $conf
+   $me
    }
 
 function current_settings {
@@ -83,7 +86,6 @@ elif [ "$1" = "-d" ]; then
     source "$conf"
     source -- "$conf"
     delete_alios $2;
-    printf "%`tput cols`s"|tr ' ' '_'
 else
     current_settings
 fi
