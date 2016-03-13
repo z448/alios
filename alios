@@ -30,8 +30,8 @@ function check_plist {
                 path=$j; 
                 name=${app##*.}; 
                 uuid=${path%%/Library*}; uuid=${uuid##*/};
-                #echo -e "\e[1m$app: \e[1m$uuid\e[0m \e[39m$name\e\_\e[30m\e[7m\e[33m $z\e[0m";
-                echo -ne "\e[30m\e[7m$app\e[0m\e[30m\e[7m\e[33m$name\e\e[7m\e[30m_$z\e[0m\n";
+                #echo -e "\e[1m$app: \e[1m$uuid\e[0m \e[39m$name\e\_\e[30m\e[7m\e[33m _\e[7m$z\e[0m";
+                echo -ne "\e[30m\e[7m$app\e[0m\e[30m\e[33m$name"__"\e[7m\e[33m$z\e[0m\n";
                 #echo -ne "\e[30m\e[7m$app\e[0m\e[39m$name\e\_\e[30m\e[7m\e[33m $z\e[0m\n";
                 echo app[$z]="$subpath$uuid" >> $cache
                 echo open[$z]="'$app'" >> $cache
@@ -50,6 +50,13 @@ function map_plist {
    $me
 }
 
+
+function find_file {
+   source "$cache"
+   target_dir=$1
+   target_file=$2
+   find $target_dir -name '*.'"$target_file"
+}
 function delete_alios {
    request=${1^^}
    echo '' > $tmp
@@ -66,7 +73,7 @@ function delete_alios {
 
 function current_settings {
 #   printf "%`tput cols`s"|tr ' ' '-'
-   echo -ne "\e[43m\e[30m alios \e[7m "
+   echo -ne "\e[43m\e[30m alios \e[7m\e[30m "
    while read line           
    do           
        if [[ $line == "alias"* ]];then
@@ -82,6 +89,8 @@ if [ "$1" = "-s" ]; then
 elif [ "$1" = "-m" ]; then
  #  source ~/.cache_alios;
     map_plist $2 $3 
+elif [ "$1" = "o_o" ]; then
+    find_file $2 $3
 elif [ "$1" = "-d" ]; then
     source "$conf"
     source -- "$conf"
