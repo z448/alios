@@ -1,6 +1,7 @@
 #### alios
 
-UPDATE: last version has no dependency on plutil.
+UPDATE: last version has no dependency on plutil. Also, the rest of this readme is outdated, see gif instead.
+
 **bash** script for ios to map custom alias name to **UUID** directory. Keeps track of any changes in UUID and rewrite path so choosen alias names stay updated.
 Works after backup/restore as config is written into sanboxed UUID app directory therefore is backed up along with app contents. 
 
