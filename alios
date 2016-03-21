@@ -31,7 +31,7 @@ function check_plist {
                 name=${app##*.}; 
                 uuid=${path%%/Library*}; uuid=${uuid##*/};
                 #echo -e "\e[1m$app: \e[1m$uuid\e[0m \e[39m$name\e\_\e[30m\e[7m\e[33m _\e[7m$z\e[0m";
-                echo -ne "\e[30m\e[7m$app\e[0m\e[30m\e[33m$name"__"\e[7m\e[33m$z\e[0m\n";
+                echo -ne "\e[8m$app\e[0m\e[30m\e[33m$name"__"\e[7m\e[33m$z\e[0m\n";
                 #echo -ne "\e[30m\e[7m$app\e[0m\e[39m$name\e\_\e[30m\e[7m\e[33m $z\e[0m\n";
                 echo app[$z]="$subpath$uuid" >> $cache
                 echo open[$z]="'$app'" >> $cache
@@ -55,7 +55,7 @@ function find_file {
    source "$cache"
    target_dir=$1
    target_file=$2
-   find $target_dir -name '*.'"$target_file"
+   find $target_dir -name '*'"$target_file"
 }
 function delete_alios {
    request=${1^^}
