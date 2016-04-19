@@ -1,15 +1,28 @@
 #!/bin/bash
 
-workig_copy=$(find /var/mobile/Containers/Shared/AppGroup -name '*.plist' | grep -i com.appliedphasor.working-copy)
+### archive content of Working Copy iOS app in ~/Documents directory ###
+##  USAGE: getwork                                                   ## 
+#                                                                    #
+#####################################################################
 
-if [[ $working_copy_plist == *"com.appliedphasor.working-copy"* ]]
+working_copy_plist=$(find ~/Containers/Shared/AppGroup | grep -i  "group.com.appliedphasor.working-copy.plist");
+working_copy="~/Documents/working_copy.tgz";
+
+if [[ $working_copy_plist == *"group.com.appliedphasor.working-copy.plist" ]]
 then
-  echo "working copy installed";
-  working_copy_path = $(dirname $working_copy_plist);
-  working_copy_base = $working_copy_path/../..;
-  echo "working_copy_path is $working_copy_path";
+  echo "# working copy is installed";
+  working_copy_plist=$(dirname $working_copy_plist);
+  working_copy_base="$working_copy_plist/../..";
+
+  echo "# working_copy_base is $working_copy_base";
+  echo -e "use \'getwork\' command to create $working_copy in ~/Documents directory"; 
+  alias getwork="tar -zcvf $working_copy $working_copy_base && cd ~/Documents";
+  
   else
        echo "working copy not installed";
 fi
+
+
+
 
 
