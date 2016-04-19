@@ -2,15 +2,18 @@
 #
 use 5.010;
 use File::Find;
+use Storable;
 use Encode;
 use Data::Dumper;
 use Term::ANSIColor;
 use Getopt::Std;
+use FreezeThaw qw< freeze thaw>;
 use JSON qw< encode_json >;
 use open qw< :encoding(UTF-8) >;
+use FreezeThaw qw(freeze thaw); # Import freeze() and thaw()
 
 my $option = {};
-my ($storage) = ();
+my ($storage, $serialize, $freezethaw, $storable, $json) = ();
 my $dump = "$ENV{HOME}/.alios.dmp";
 my @search_base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 my $app = {};
@@ -30,9 +33,14 @@ for(keys %$app){
     print colored(['green'], 'uuid: ') . $app->{$_} . "\n";
 }
 
+# --dumper
 my $dumper = Data::Dumper->Dump([$app]);
 open(my $fh,">",$dump);
 print $dumper;
+print $fh $dumper;
+close $fh; undef $fh;
+
+open(my $fh,">",'dumper');
 print $fh $dumper;
 close $fh; undef $fh;
 
@@ -40,10 +48,23 @@ open($fh,"<","$ENV{HOME}/.alios.dmp");
 while(<$fh>){ $storage .= $_ }
 close $fh; undef $fh;
 
-
-#print Dumper($conf);
 eval $storage;
+#print Dumper($conf);
 print $VAR1->{"com.opera.Coast.plist"};
 
-my $json = encode_json $app;
-#print $json;
+# --json
+open(my $fh,">","json");
+$json = encode_json $app;
+print $fh $json;
+close $fh; undef $fh;
+
+# --freezethaw
+$freezethaw = freeze($app, $obj);
+open (F, "> freezethaw") || die;
+syswrite (F, $freezethaw, length($freezethaw)); # can also use write() or print()
+
+# --storable
+eval { store($app, 'storable.dat') };
+print "Error writing to file: $@" if $@;
+$storable = retrieve('storable.dat');
+
