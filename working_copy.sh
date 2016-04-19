@@ -15,14 +15,9 @@ then
   working_copy_base="$working_copy_plist/../..";
 
   echo "# working_copy_base is $working_copy_base";
-  echo -e "use \'getwork\' command to create $working_copy in ~/Documents directory"; 
-  alias getwork="tar -zcvf $working_copy $working_copy_base && cd ~/Documents";
+  echo -e "use 'getwork' command to create $working_copy in ~/Documents directory"; 
+  alias getwork="cd $working_copy_base/File\ Provider\ Storage && tar -zcvf $working_copy * && cd ~/Documents";
   
   else
        echo "working copy not installed";
 fi
-
-
-
-
-
