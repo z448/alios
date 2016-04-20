@@ -72,25 +72,28 @@ my $serialize = sub {
 #$init->(); $serialize->();
 
 # --dumper read
-
-{   
-    open( my $dmp,"<",$dumper) || die "cant open $dumper:$!";
+sub deserialize {
     say colored(['green'], '$deserializing: ') . "dumper"; #----------------debug
-    undef $/;
-    eval<$dmp>;
-    die "cannot recreate data structures from \"$dumper\": $@" if $@;
-    $/ = "\n";
-    close $dmp; 
+    open( $fh,"<",$dumper) || die "cant open $dumper:$!";
+    local $/ = undef;  # read whole file
+    my $app = <$fh>;
+    close $fh;
+    return @{ eval $app };
+    print Dumper($app);
 }
+
+#say deserialize();
 
 # --search appids
 my $search = sub {
     my $filter = shift;
     $filter = qr/$filter/;
-    my @filter = grep { $_->{"apid"} =~ /$filter/ } @app;
+    my @filter = grep { $_->{"apid"} =~ /$filter/ } deserialize();
     return \@filter;
 };      
 
+#$init->();
+say  $_->{apid} for(@{$search->($option->{s})});
 
 my $check = sub {
     say colored(['green'], '$check: ') . "plists"; #----------------debug
@@ -104,24 +107,18 @@ my $check = sub {
 };  
 
 #$check->();
-
-
-
 for(keys %$option){
     say colored(['green'], 'options: ') . "..."; #----------------debug
     if(defined $option->{i}){
-        say "initializing..."; $init->()
+        say "initializing..."; $init->();
     } elsif(defined $option->{s}){
         for( @{$search->($option->{s})}){
             say $_->{apnr} . ' >> ' . $_->{apid};
         }
-    }
-    elsif($option->{f}){
-        say $search->($option->{f});
     } else {
         # --dumper status
         my $dumper_status = Dumper($app);
-        say colored(['green'], 'dumper read status: ') unless ($dumper_status); #----------------debug
+        say colored(['green'], 'dumper read status: ') unless ($dumper_status); #---------debug
         say "default option";
     }
 }
