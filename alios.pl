@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 #
 use 5.010;
+use warnings;
+use strict;
 use File::Find;
 use Storable;
 use Encode;
@@ -12,13 +14,14 @@ use open qw< :encoding(UTF-8) >;
 
 my $option = {};
 my (@app, @search_base, $storable, $json) = ();
-my @search_base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
+@search_base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 $storable = "$ENV{HOME}/.alios.dat";
 $json = "$ENV{HOME}/.alios.json";
 getopts('d:m:f:', $option);
 
 find( sub{ 
         my $i = 0;
+        my %app = ();
         my $plist_path = "$File::Find::dir/$_";
         if($plist_path =~ /Library\/Preferences\/.*\.plist/){
             my $match = "$File::Find::dir/$_";
@@ -43,17 +46,14 @@ close $fh; undef $fh;
 
 # --search appids
 my $map = sub {
-    my @match = ();
     my $filter = qr/$option->{f}/;
-    my @filtered = grep { $_->{"apid"} =~ /$filter/ } @app;
-    for(@filtered){ 
-        my $match = $_->{apnr} . ' >> ' . $_->{apid} . ' >> ' . $_->{uuid};
-        push @match, $match;
-    };  return \@match;
+    my @filter = grep { $_->{"apid"} =~ /$filter/ } @app;
+    \@filter;
 };      
 
+# --get app values
+say $_->{apid} for( @{$map->()} );
 
-say @{$map->()};
 
 
 
