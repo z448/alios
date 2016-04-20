@@ -7,17 +7,31 @@ use Encode;
 use Data::Dumper;
 use Term::ANSIColor;
 use Getopt::Std;
-use FreezeThaw qw< freeze thaw>;
+use Sys::Hostname;
 use JSON qw< encode_json >;
 use open qw< :encoding(UTF-8) >;
-use FreezeThaw qw(freeze thaw); # Import freeze() and thaw()
 
 my $option = {};
-my ($storage, $serialize, $freezethaw, $storable, $json) = ();
-my $dump = "$ENV{HOME}/.alios.dmp";
-my @search_base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 my $app = {};
+my (@search_base, $storable, $json) = ();
+my @search_base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
+$storable = "$ENV{HOME}/.alios.dat";
+$json = "$ENV{HOME}/.alios.json";
 getopts('d:m:s', $option);
+
+
+# --find hostname, if not ios use local test env
+$host = hostname;
+say "$host";
+if( $host =~ /ria/){
+    say "IN RIA";
+    @search_base = ("Containers/Data/Application","Containers/Shared/AppGroup");
+    $storable = ".alios.dat";
+    $json = ".alios.json";
+};
+
+say $storable;
+
 
 find( sub{ 
         my $plist_path = "$File::Find::dir/$_";
@@ -33,38 +47,14 @@ for(keys %$app){
     print colored(['green'], 'uuid: ') . $app->{$_} . "\n";
 }
 
-# --dumper
-my $dumper = Data::Dumper->Dump([$app]);
-open(my $fh,">",$dump);
-print $dumper;
-print $fh $dumper;
-close $fh; undef $fh;
-
-open(my $fh,">",'dumper');
-print $fh $dumper;
-close $fh; undef $fh;
-
-open($fh,"<","$ENV{HOME}/.alios.dmp");
-while(<$fh>){ $storage .= $_ }
-close $fh; undef $fh;
-
-eval $storage;
-#print Dumper($conf);
-print $VAR1->{"com.opera.Coast.plist"};
-
 # --json
-open(my $fh,">","json");
+open(my $fh,">",$json);
 $json = encode_json $app;
 print $fh $json;
 close $fh; undef $fh;
 
-# --freezethaw
-$freezethaw = freeze($app, $obj);
-open (F, "> freezethaw") || die;
-syswrite (F, $freezethaw, length($freezethaw)); # can also use write() or print()
-
 # --storable
-eval { store($app, 'storable.dat') };
+eval { store($app, $storable) };
 print "Error writing to file: $@" if $@;
-$storable = retrieve('storable.dat');
+$storable = retrieve($storable);
 
