@@ -11,12 +11,12 @@ use Data::Dumper;
 use Term::ANSIColor;
 use Getopt::Std;
 use JSON qw< encode_json >;
-#use open qw< :encoding(UTF-8) >;
+use open qw< :encoding(UTF-8) >;
 
 my $option = {};
+getopts('s:m:f:i', $option);
 my $apnr = 0;
 my ($dumper, $app, $config, @app, @base, $store, $json) = ();
-getopts('d:m:f:i', $option);
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
@@ -73,17 +73,19 @@ my $serialize = sub {
 
 # --dumper read
 
-{   open( my $dmp,"<",$dumper) || die "cant open $dumper:$!";
+{   
+    open( my $dmp,"<",$dumper) || die "cant open $dumper:$!";
     say colored(['green'], '$deserializing: ') . "dumper"; #----------------debug
     undef $/;
     eval<$dmp>;
     die "cannot recreate data structures from \"$dumper\": $@" if $@;
     $/ = "\n";
-    close $dmp; }
+    close $dmp; 
+}
 
 # --search appids
-my $map = sub {
-    my $filter = '.';
+my $search = sub {
+    my $filter = shift;
     $filter = qr/$filter/;
     my @filter = grep { $_->{"apid"} =~ /$filter/ } @app;
     return \@filter;
@@ -91,7 +93,8 @@ my $map = sub {
 
 
 my $check = sub {
-    for( @{$map->()} ){
+    say colored(['green'], '$check: ') . "plists"; #----------------debug
+    for( @{$search->()} ){
         if( -f $_->{plist}){ 
             say $_->{apid} . ' >> ' . 'ok';
         } else { 
@@ -102,15 +105,24 @@ my $check = sub {
 
 #$check->();
 
-# --get app values
-print Dumper($app);
 
-__DATA__
-say $_->{apid} for( @{$map->()} );
 
 for(keys %$option){
-#    when(/^i$/)     { $init->() }
-    when(/^s$/)     { $map->($option->{s}) }
-    when(/^f$/)     { $map->($option->{f}) }
+    say colored(['green'], 'options: ') . "..."; #----------------debug
+    if(defined $option->{i}){
+        say "initializing..."; $init->()
+    } elsif(defined $option->{s}){
+        for( @{$search->($option->{s})}){
+            say $_->{apnr} . ' >> ' . $_->{apid};
+        }
+    }
+    elsif($option->{f}){
+        say $search->($option->{f});
+    } else {
+        # --dumper status
+        my $dumper_status = Dumper($app);
+        say colored(['green'], 'dumper read status: ') unless ($dumper_status); #----------------debug
+        say "default option";
+    }
 }
 
