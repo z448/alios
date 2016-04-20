@@ -11,60 +11,60 @@ use Data::Dumper;
 use Term::ANSIColor;
 use Getopt::Std;
 use JSON qw< encode_json >;
-use open qw< :encoding(UTF-8) >;
+#use open qw< :encoding(UTF-8) >;
 
 my $option = {};
-my (@app, @base, $store, $json) = ();
+my $apnr = 0;
+my ($dumper, $config, @app, @base, $store, $json) = ();
 getopts('d:m:f:i', $option);
 
-#--- is in 'config';  DELETE
+# --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
-$store = "$ENV{HOME}/.alios.dat";
+$dumper = "$ENV{HOME}/.alios.dmp";
 $json = "$ENV{HOME}/.alios.json";
-
-my $conf = {};
+$config = "./config";
+ 
+my $conf = {};  
 $conf->{base}= \@base;
 $conf->{store}=$store;
 $conf->{json}=$json;
 
-store $conf, 'config';
-undef $conf;
-#---
-
-$conf = retrieve('config');
-print Dumper($conf);
+open(my $fh, ">",$config) or die "$! cant open: $config";
+print $fh $conf;
+close $fh;
+# ---
 
 my $init = sub {
     find( sub{ 
-        my $i = 0;
         my %app = ();
         my $plist_path = "$File::Find::dir/$_";
         if($plist_path =~ /Library\/Preferences\/.*\.plist/){
             my $match = "$File::Find::dir/$_";
-            $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5/;
+            $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
             $app{path} = $1 . $2 . $3 . $4;
             $app{plist} = $1 . $2 . $3 . $4 . $5 . $6;
-            $app{apnr} = $i;
+            $app{apnr} = $apnr;
             $app{apid} = $5;
             $app{uuid} = $3;
             push @app,{%app};
-            $i++;
+            $apnr++;
         }
     },  @base );
-
-# --json
-    open(my $fh,">",$json);
-    my $jay = encode_json \@app;
-    print $fh $jay;
-    close $fh; undef $fh;
-# --storable
-    store \@app, $store;
-    return \@app;
 };
 
 # --init
 $init->();
-# --retrive file
+
+# --json write
+open($fh,">",$json);
+my $jay = encode_json \@app;
+print $fh $jay;
+close $fh;
+
+# --dumper write
+open(my $dmp, ">",$dumper);
+print $dmp Data::Dumper->Dump([ \@app ],['app']);
+close $dmp;
 
 # --search appids
 my $map = sub {
@@ -72,6 +72,7 @@ my $map = sub {
     my @filter = grep { $_->{"apid"} =~ /$filter/ } @app;
     return \@filter;
 };      
+
 
 # --get app values
 say $_->{apid} for( @{$map->()} );
@@ -86,7 +87,7 @@ for( @{$map->()} ){
 }
 
 for(keys %$option){
-    when(/^i$/)     { $init->() }
+#    when(/^i$/)     { $init->() }
     when(/^s$/)     { $map->($option->{s}) }
     when(/^f$/)     { $map->($option->{f}) }
 }
