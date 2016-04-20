@@ -15,7 +15,7 @@ use JSON qw< encode_json >;
 
 my $option = {};
 my $apnr = 0;
-my ($dumper, $config, @app, @base, $store, $json) = ();
+my ($dumper, $app, $config, @app, @base, $store, $json) = ();
 getopts('d:m:f:i', $option);
 
 # --- is in 'config';  DELETE
@@ -52,39 +52,61 @@ my $init = sub {
     },  @base );
 };
 
-# --init
-$init->();
 
+my $serialize = sub {
 # --json write
-open($fh,">",$json);
-my $jay = encode_json \@app;
-print $fh $jay;
-close $fh;
+    say colored(['green'], '$serialize: ') . "starting json"; #---------------debug
+    open($fh,">",$json) || die "cant open $json: $!";
+    my $jay = encode_json \@app;
+    print $fh $jay;
+    close $fh;
 
 # --dumper write
-open(my $dmp, ">",$dumper);
-print $dmp Data::Dumper->Dump([ \@app ],['app']);
-close $dmp;
+    say colored(['green'], '$serialize: ') . "starting dumper"; #----------------debug
+    open(my $dmp, ">",$dumper) || die "cant open $dumper: $!";
+    print $dmp Data::Dumper->Dump([ \@app ],['app']);
+    close $dmp;
+};  
+
+# --init; todo: move to -i option only
+#$init->(); $serialize->();
+
+# --dumper read
+
+{   open( my $dmp,"<",$dumper) || die "cant open $dumper:$!";
+    say colored(['green'], '$deserializing: ') . "dumper"; #----------------debug
+    undef $/;
+    eval<$dmp>;
+    die "cannot recreate data structures from \"$dumper\": $@" if $@;
+    $/ = "\n";
+    close $dmp; }
 
 # --search appids
 my $map = sub {
-    my $filter = qr/$option->{f}/;
+    my $filter = '.';
+    $filter = qr/$filter/;
     my @filter = grep { $_->{"apid"} =~ /$filter/ } @app;
     return \@filter;
 };      
 
 
-# --get app values
-say $_->{apid} for( @{$map->()} );
-
-for( @{$map->()} ){
-    if( -f $_->{plist}){ 
-        say $_->{plist};
-        say $_->{apid} . ' >> ' . 'ok';
-    } else { 
-        say colored(['cyan on_red'], $_->{apid} . ' >> ' . 'notok');
+my $check = sub {
+    for( @{$map->()} ){
+        if( -f $_->{plist}){ 
+            say $_->{apid} . ' >> ' . 'ok';
+        } else { 
+            say colored(['yellow'], $_->{apid} . ' >> ' . 'notok');
+        }
     }
-}
+};  
+
+#$check->();
+
+# --get app values
+print Dumper($app);
+
+__DATA__
+say $_->{apid} for( @{$map->()} );
 
 for(keys %$option){
 #    when(/^i$/)     { $init->() }
