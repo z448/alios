@@ -37,7 +37,7 @@ close $fh;
 
 my $repath = sub {
     my $broken = shift;
-    say colored(['black on_yellow'], '$repath: ') . ""; #---------------debug
+    say colored(['black on_yellow'], '$repath: ->') . ""; #---------------debug
     say "broken links:";
     for(@$broken){
         say $_->{apid};
@@ -46,7 +46,7 @@ my $repath = sub {
 
 my $serialize = sub {
 # --json write
-    say colored(['black on_yellow'], '$serialize: ') . "json"; #---------------debug
+    say colored(['black on_yellow'], '$serialize: ->') . "json"; #---------------debug
     open(my $jfh,">",$json) || die "cant open $json: $!";
     my $jay = encode_json \@app;
     print $jfh $jay;
@@ -54,7 +54,7 @@ my $serialize = sub {
     $jfh = undef;
 
 # --dumper write
-    say colored(['black on_yellow'], '$serialize: ') . "dumper"; #----------------debug
+    say colored(['black on_yellow'], '$serialize: ->') . "dumper"; #----------------debug
     open(my $dfh, ">",$dumper) || die "cant open $dumper: $!";
     print $dfh Data::Dumper->Dump([ \@app ],['app']);
     close $dfh;
@@ -62,23 +62,23 @@ my $serialize = sub {
 
 # --dumper read
 my $deserialize = sub {
-    say colored(['black on_yellow'], '$deserialize: ') . "dumper"; #----------------debug
+    my $a = [];
+    say colored(['black on_yellow'], '$deserialize: ->') . "dumper"; #----------------debug
     open(my $dfhr,"< $dumper") or die "Cant open $dumper: $!";
 #or close $dfh_r and say "cant open $dumper:$!\n reserialze..." and $serialize->() and return; 
     local $/ = undef;  # read whole file
-    my $app = <$dfhr>;
+    $a = <$dfhr>;
     #close $dfh_r;
-    #return @{ eval @app };
-    return @app;
+    return @{ eval @$a };
 };
-#$deserialize->();
+say $deserialize->() and die;
 
 # --search appids
 my $search = sub {
-    say colored(['black on_yellow'], '$search: ') . "\$filter"; #----------------debug
     my $filter = shift;
+    say colored(['black on_yellow'], '$search: ->') . "$filter"; #----------------debug
     $filter = qr/$filter/;
-    my @filter = grep { $_->{"apid"} =~ /$filter/ } $deserialize->();
+    my @filter = grep { $_->{"apid"} =~ /$filter/ } @{$deserialize->()};
     return \@filter;
 };      
 
@@ -86,11 +86,10 @@ my $search = sub {
 #say  $_->{apid} for(@{$search->($option->{s})});
 
 my $check = sub {
-    say colored(['black on_yellow'], '$check: ') . "plists"; #----------------debug
+    say colored(['black on_yellow'], '$check: ->') . "plists"; #----------------debug
     my @broken = ();
-    say 'in check' . $_ for($deserialize->()) and die "$!";
-    for( $deserialize->() ){
-        if( -f $_->{plist}){
+    for( @{$deserialize->()} ){
+        if( ! -f $_->{plist}){
             # ------------------------todo: create $repath->($_->{plist})
             say colored(['yellow'], $_->{apid} . ' >> ' . 'path broken');
             push @broken, $_;
@@ -100,7 +99,7 @@ my $check = sub {
 };  
 
 my $init = sub {
-    say colored(['black on_yellow'], '$init: ') . "..."; #----------------debug
+    say colored(['black on_yellow'], '$init: ->') . "..."; #----------------debug
     find( sub{ 
         my %app = ();
         my $plist_path = "$File::Find::dir/$_";
@@ -118,9 +117,10 @@ my $init = sub {
     },  @base );
 };
 
+say "check" unless ($check->());
 
-for(keys %$option){
-    say colored(['black on_yellow'], ' option: ') . "..."; #----------------debug
+sub option {
+    say colored(['black on_yellow'], ' option: ->') . "..."; #----------------debug
 
     # initialize (-i)
     if(defined $option->{i}){
@@ -128,15 +128,17 @@ for(keys %$option){
     } 
     # search (-s keyword) 
     elsif(defined $option->{s}){
+        my $s = $search->($option->{s});
         say "\$option->(s): say \$_->{apnr} ..."; 
-        for( @{$search->($option->{s})}){
-            say $_->{apnr} . ' >> ' . $_->{apid};
-        }
+        print Dumper($s);
+
+        #for(@$s){
+        #    say 'search results: ' . $_->{apid};
+        #}
     } 
 }
-
+option();
 # --check $app->{plist} after each alios command
-say "check" unless ($check->());
 
 =head1 NAME
 
