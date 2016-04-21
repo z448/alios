@@ -93,11 +93,11 @@ my $search = sub {
 };      
 
 #$init->();
-say  $_->{apid} for(@{$search->($option->{s})});
+#say  $_->{apid} for(@{$search->($option->{s})});
 
 my $check = sub {
     say colored(['green'], '$check: ') . "plists"; #----------------debug
-    for( @{$search->()} ){
+    for( @{$search->('.')} ){
         if( -f $_->{plist}){ 
             say $_->{apid} . ' >> ' . 'ok';
         } else { 
@@ -106,17 +106,21 @@ my $check = sub {
     }
 };  
 
-#$check->();
+$check->() and die;
 for(keys %$option){
     say colored(['green'], 'options: ') . "..."; #----------------debug
+    # initialize (-i)
     if(defined $option->{i}){
         say "initializing..."; $init->();
+        # search (-s keyword) 
     } elsif(defined $option->{s}){
         for( @{$search->($option->{s})}){
             say $_->{apnr} . ' >> ' . $_->{apid};
         }
     } else {
-        # --dumper status
+        # check (no option)
+        say colored(['green'], 'no option: ') . 'call $check->()'; #----------------debug
+        $check->();
         my $dumper_status = Dumper($app);
         say colored(['green'], 'dumper read status: ') unless ($dumper_status); #---------debug
         say "default option";
