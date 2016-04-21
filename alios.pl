@@ -95,11 +95,10 @@ my $search = sub {
 
 my $check = sub {
     say colored(['green'], '$check: ') . "plists"; #----------------debug
-    for( @{$search->('.')} ){
-        if( -f $_->{plist}){ 
-            say $_->{apid} . ' >> ' . 'ok';
-        } else { 
-            say colored(['yellow'], $_->{apid} . ' >> ' . 'notok');
+    for( @{ $search->('.') } ){
+        if( -f $_->{plist}){
+            # ------------------------todo: create $repath->($_->{plist})
+            say colored(['yellow'], $_->{apid} . ' >> ' . 'path broken') and $repath->($_->{plist});
         }
     }
 };  
@@ -134,12 +133,17 @@ $check->();
 
 =over 16
 
+-source from ~/.bashrc or ~/.bash_profile
+
 =item C<alios -p && source ~/.alios>
 
+-search app
 =item C<alios [-s] [keyword]>
 
+-map alias and $variable
 =item C<alios [-m] [nr appname]>
 
+- inifialize
 =item C<alios [-i]>
 
 =back
@@ -148,7 +152,7 @@ $check->();
 
 =over 16
 
-=item Loops through application UUIDs in C<~/Container> directories and assign numbers to display IDs which can be used to create L<alias> for directory path that can be used to quickily switch into application directory. Additionaly, env C<$VARIABLE> is created to use in scripts and C<$variable> holding display id of application to use with other tools such as activator, open etc.
+=item Loops through application UUIDs in C<~/Container> directories and assign numbers to display IDs which can be used to create L<alias> for directory path that can be used to quickily switch into application directory. Additionaly, env C<$VARIABLE> is created to use in scripts and C<$variable> display id of application to use with other tools such as activator, open etc.
 
 =back
 
