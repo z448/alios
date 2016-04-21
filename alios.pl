@@ -16,14 +16,15 @@ use open qw< :encoding(UTF-8) >;
 my $option = {};
 getopts('s:m:f:i', $option);
 my $apnr = 0;
-my ($dumper, $app, $config, @app, @base, $store, $json) = ();
+my ($dfh_r, $dumper, $app, $config, @app, @base, $store, $json) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 $dumper = "$ENV{HOME}/.alios.dmp";
 $json = "$ENV{HOME}/.alios.json";
 $config = "./config";
- 
+
+=head1
 my $conf = {};  
 $conf->{base}= \@base;
 $conf->{store}=$store;
@@ -32,11 +33,20 @@ $conf->{json}=$json;
 open(my $fh, ">",$config) or die "$! cant open: $config";
 print $fh $conf;
 close $fh;
-# ---
+=cut
+
+my $repath = sub {
+    my $broken = shift;
+    say colored(['black on_yellow'], '$repath: ') . ""; #---------------debug
+    say "broken links:";
+    for(@$broken){
+        say $_->{apid};
+    }
+};
 
 my $serialize = sub {
 # --json write
-    say colored(['green'], '$serialize: ') . "json"; #---------------debug
+    say colored(['black on_yellow'], '$serialize: ') . "json"; #---------------debug
     open(my $jfh,">",$json) || die "cant open $json: $!";
     my $jay = encode_json \@app;
     print $jfh $jay;
@@ -44,26 +54,53 @@ my $serialize = sub {
     $jfh = undef;
 
 # --dumper write
-    say colored(['green'], '$serialize: ') . "dumper"; #----------------debug
+    say colored(['black on_yellow'], '$serialize: ') . "dumper"; #----------------debug
     open(my $dfh, ">",$dumper) || die "cant open $dumper: $!";
     print $dfh Data::Dumper->Dump([ \@app ],['app']);
     close $dfh;
 };  
 
 # --dumper read
-sub deserialize {
-    say colored(['green'], '$deserialize: ') . "dumper"; #----------------debug
-
-    open(my $fh,"<",$dumper) || close $fh and say "cant open $dumper:$!\n reserialze..." and $serialize->() and return; 
+my $deserialize = sub {
+    say colored(['black on_yellow'], '$deserialize: ') . "dumper"; #----------------debug
+    open(my $dfhr,"< $dumper") or die "Cant open $dumper: $!";
+#or close $dfh_r and say "cant open $dumper:$!\n reserialze..." and $serialize->() and return; 
     local $/ = undef;  # read whole file
-    my $app = <$fh>;
-    close $fh;
-    return @{ eval $app };
-}
-# --deserialize in first step
-deserialize();
+    my $app = <$dfhr>;
+    #close $dfh_r;
+    #return @{ eval @app };
+    return @app;
+};
+#$deserialize->();
+
+# --search appids
+my $search = sub {
+    say colored(['black on_yellow'], '$search: ') . "\$filter"; #----------------debug
+    my $filter = shift;
+    $filter = qr/$filter/;
+    my @filter = grep { $_->{"apid"} =~ /$filter/ } $deserialize->();
+    return \@filter;
+};      
+
+#$init->();
+#say  $_->{apid} for(@{$search->($option->{s})});
+
+my $check = sub {
+    say colored(['black on_yellow'], '$check: ') . "plists"; #----------------debug
+    my @broken = ();
+    say 'in check' . $_ for($deserialize->()) and die "$!";
+    for( $deserialize->() ){
+        if( -f $_->{plist}){
+            # ------------------------todo: create $repath->($_->{plist})
+            say colored(['yellow'], $_->{apid} . ' >> ' . 'path broken');
+            push @broken, $_;
+        }
+    }
+    $repath->(\@broken);
+};  
 
 my $init = sub {
+    say colored(['black on_yellow'], '$init: ') . "..."; #----------------debug
     find( sub{ 
         my %app = ();
         my $plist_path = "$File::Find::dir/$_";
@@ -82,34 +119,16 @@ my $init = sub {
 };
 
 
-# --search appids
-my $search = sub {
-    my $filter = shift;
-    $filter = qr/$filter/;
-    my @filter = grep { $_->{"apid"} =~ /$filter/ } deserialize();
-    return \@filter;
-};      
-
-#$init->();
-#say  $_->{apid} for(@{$search->($option->{s})});
-
-my $check = sub {
-    say colored(['green'], '$check: ') . "plists"; #----------------debug
-    for( @{ $search->('.') } ){
-        if( -f $_->{plist}){
-            # ------------------------todo: create $repath->($_->{plist})
-            say colored(['yellow'], $_->{apid} . ' >> ' . 'path broken') and $repath->($_->{plist});
-        }
-    }
-};  
-
 for(keys %$option){
-    say colored(['green'], 'options: ') . "..."; #----------------debug
+    say colored(['black on_yellow'], ' option: ') . "..."; #----------------debug
+
     # initialize (-i)
     if(defined $option->{i}){
-        say "initializing..."; $init->() and $serialize->();
-        # search (-s keyword) 
-    } elsif(defined $option->{s}){
+        $init->(); $serialize->() and say " option\$option->{i} \$init->(); \$serialize->()..."; 
+    } 
+    # search (-s keyword) 
+    elsif(defined $option->{s}){
+        say "\$option->(s): say \$_->{apnr} ..."; 
         for( @{$search->($option->{s})}){
             say $_->{apnr} . ' >> ' . $_->{apid};
         }
@@ -117,9 +136,7 @@ for(keys %$option){
 }
 
 # --check $app->{plist} after each alios command
-$check->();
-
-
+say "check" unless ($check->());
 
 =head1 NAME
 
