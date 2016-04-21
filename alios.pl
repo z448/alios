@@ -34,6 +34,35 @@ print $fh $conf;
 close $fh;
 # ---
 
+my $serialize = sub {
+# --json write
+    say colored(['green'], '$serialize: ') . "json"; #---------------debug
+    open(my $jfh,">",$json) || die "cant open $json: $!";
+    my $jay = encode_json \@app;
+    print $jfh $jay;
+    close $jfh; 
+    $jfh = undef;
+
+# --dumper write
+    say colored(['green'], '$serialize: ') . "dumper"; #----------------debug
+    open(my $dfh, ">",$dumper) || die "cant open $dumper: $!";
+    print $dfh Data::Dumper->Dump([ \@app ],['app']);
+    close $dfh;
+};  
+
+# --dumper read
+sub deserialize {
+    say colored(['green'], '$deserialize: ') . "dumper"; #----------------debug
+
+    open(my $fh,"<",$dumper) || close $fh and say "cant open $dumper:$!\n reserialze..." and $serialize->() and return; 
+    local $/ = undef;  # read whole file
+    my $app = <$fh>;
+    close $fh;
+    return @{ eval $app };
+}
+# --deserialize in first step
+deserialize();
+
 my $init = sub {
     find( sub{ 
         my %app = ();
@@ -52,37 +81,6 @@ my $init = sub {
     },  @base );
 };
 
-
-my $serialize = sub {
-# --json write
-    say colored(['green'], '$serialize: ') . "starting json"; #---------------debug
-    open($fh,">",$json) || die "cant open $json: $!";
-    my $jay = encode_json \@app;
-    print $fh $jay;
-    close $fh;
-
-# --dumper write
-    say colored(['green'], '$serialize: ') . "starting dumper"; #----------------debug
-    open(my $dmp, ">",$dumper) || die "cant open $dumper: $!";
-    print $dmp Data::Dumper->Dump([ \@app ],['app']);
-    close $dmp;
-};  
-
-# --init; todo: move to -i option only
-#$init->(); $serialize->();
-
-# --dumper read
-sub deserialize {
-    say colored(['green'], '$deserializing: ') . "dumper"; #----------------debug
-    open( $fh,"<",$dumper) || die "cant open $dumper:$!";
-    local $/ = undef;  # read whole file
-    my $app = <$fh>;
-    close $fh;
-    return @{ eval $app };
-    print Dumper($app);
-}
-
-#say deserialize();
 
 # --search appids
 my $search = sub {
@@ -106,24 +104,56 @@ my $check = sub {
     }
 };  
 
-$check->() and die;
 for(keys %$option){
     say colored(['green'], 'options: ') . "..."; #----------------debug
     # initialize (-i)
     if(defined $option->{i}){
-        say "initializing..."; $init->();
+        say "initializing..."; $init->() and $serialize->();
         # search (-s keyword) 
     } elsif(defined $option->{s}){
         for( @{$search->($option->{s})}){
             say $_->{apnr} . ' >> ' . $_->{apid};
         }
-    } else {
-        # check (no option)
-        say colored(['green'], 'no option: ') . 'call $check->()'; #----------------debug
-        $check->();
-        my $dumper_status = Dumper($app);
-        say colored(['green'], 'dumper read status: ') unless ($dumper_status); #---------debug
-        say "default option";
-    }
+    } 
 }
+
+# --check $app->{plist} after each alios command
+$check->();
+
+
+
+=head1 NAME
+
+=over 16
+
+=item alios - jump over iOS application UUIDs 
+
+=back
+
+=head1 SYNOPSIS
+
+=over 16
+
+=item C<alios -p && source ~/.alios>
+
+=item C<alios [-s] [keyword]>
+
+=item C<alios [-m] [nr appname]>
+
+=item C<alios [-i]>
+
+=back
+
+=head1 DESCRIPTION
+
+=over 16
+
+=item Loops through application UUIDs in C<~/Container> directories and assign numbers to display IDs which can be used to create L<alias> for directory path that can be used to quickily switch into application directory. Additionaly, env C<$VARIABLE> is created to use in scripts and C<$variable> holding display id of application to use with other tools such as activator, open etc.
+
+=back
+
+=cut
+
+
+
 
