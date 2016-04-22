@@ -10,7 +10,7 @@ use Encode;
 use Data::Dumper;
 use Term::ANSIColor;
 use Getopt::Std;
-use JSON qw< encode_json >;
+use JSON qw< encode_json decode_json>;
 use open qw< :encoding(UTF-8) >;
 
 my $option = {};
@@ -35,23 +35,45 @@ print $fh $conf;
 close $fh;
 =cut
 
+my $init = sub {
+    say colored(['black on_yellow'], ' $init:') . "..."; #----------------debug
+    find( sub{ 
+        my %app = ();
+        if( "$File::Find::dir/$_" =~ /Library\/Preferences\/.*\.plist/){
+            print " match"; #----------------------------------debug
+            my $match = "$File::Find::dir/$_";
+            $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
+            $app{path} = $1 . $2 . $3 . $4;
+            $app{plist} = $1 . $2 . $3 . $4 . $5 . $6;
+            $app{apnr} = $apnr;
+            $app{apid} = $5;
+            $app{uuid} = $3;
+            push @app,{%app};
+            $apnr++;
+        } #else { print "$_ \," }
+    },  @base );
+};
+
+
 my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], ' $repath:') . ""; #---------------debug
     say "broken links:";
     for(@$broken){
-        say $_->{apid};
+        print colored(['black on_red'], "\t" . $_->{apid});
     }
+    say colored(['white on_yellow'], ' $init->(), deserialize()') . ""; #---------------debug
+    $init->(), deserialize();
 };
 
 sub serialize {
 # --json write
     say colored(['black on_yellow'], ' $serialize:') . "json"; #---------------debug
     open(my $jfh,">",$json) || die "cant open $json: $!";
-    my $jay = encode_json \@app;
-    print $jfh $jay;
+    my $j = encode_json \@app;
+    print $jfh $j;
     close $jfh; 
-    $jfh = undef;
+    undef $jfh; 
 
 # --dumper write
     $Data::Dumper::Purity = 1;
@@ -61,29 +83,38 @@ sub serialize {
     close $dfh;
 }  
 
+=head1
 # --dumper read
-{
     say colored(['black on_yellow'], ' deserializng:') . "dumper"; #----------------debug
     open($dfhr,"< $dumper") or die "Cant open $dumper: $!";
     local $/ = undef;
     
    # undef $/;   
     say colored(['blue'],<$dfhr>);
-    eval <$dfhr>;  # ------------------------???????????????????????????????
+    print eval{ <$dfhr> };  # ------------------------???????????????????????????????
     close $dfhr;
+=cut
+
+# --json read
+sub deserialize {
+    open(my $jfh,"<","$json");
+    local $\ = undef;
+    my $j = <$jfh>;
+    @app = @{decode_json $j};
+    return \@app;
 }
+
+say colored(['red'],deserialize());
+say colored(['green'],@{deserialize()});
 
 # --search appids
 my $search = sub {
     my $filter = shift;
     say colored(['black on_yellow'], ' $search:') . "$filter"; #----------------debug
-    $filter = qr/$filter/;
-    my @filter = grep { $_->{"apid"} =~ /$filter/ } @app;
+    $filter = lc qr/$filter/;
+    my @filter = grep { lc $_->{"apid"} =~ /$filter/ } @app;
     return \@filter;
 };      
-
-#$init->();
-#say  $_->{apid} for(@{$search->($option->{s})});
 
 my $check = sub {
     say colored(['black on_yellow'], ' $check:') . "plists"; #----------------debug
@@ -98,25 +129,8 @@ my $check = sub {
     $repath->(\@broken);
 };  
 
-my $init = sub {
-    say colored(['black on_yellow'], ' $init:') . "..."; #----------------debug
-    find( sub{ 
-        my %app = ();
-        if( "$File::Find::dir/$_" =~ /Library\/Preferences\/.*\.plist/){
-            say "match"; #----------------------------------debug
-            my $match = "$File::Find::dir/$_";
-            $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
-            $app{path} = $1 . $2 . $3 . $4;
-            $app{plist} = $1 . $2 . $3 . $4 . $5 . $6;
-            $app{apnr} = $apnr;
-            $app{apid} = $5;
-            $app{uuid} = $3;
-            push @app,{%app};
-            $apnr++;
-        } else { print "$_ \," }
-    },  @base );
-};
-
+# --check for broken links
+$check->();
 #say "check" unless ($check->());
 
 sub option {
@@ -135,7 +149,6 @@ sub option {
     } 
 }
 option();
-# --check $app->{plist} after each alios command
 
 =head1 NAME
 
