@@ -16,7 +16,7 @@ use open qw< :encoding(UTF-8) >;
 my $option = {};
 getopts('s:m:f:i', $option);
 my $apnr = 0;
-my ($dfh_r, $dumper, $app, $config, @app, @base, $store, $json) = ();
+my ($dfhr, $dumper, $app, $config, @app, @base, $store, $json) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
@@ -54,6 +54,7 @@ sub serialize {
     $jfh = undef;
 
 # --dumper write
+    $Data::Dumper::Purity = 1;
     say colored(['black on_yellow'], ' serialize:') . "dumper"; #----------------debug
     open(my $dfh, ">",$dumper) || die "cant open $dumper: $!";
     print $dfh Data::Dumper->Dump([ \@app ],['app']);
@@ -61,21 +62,19 @@ sub serialize {
 }  
 
 # --dumper read
-sub deserialize {
-    say colored(['black on_yellow'], ' deserialize():') . "dumper"; #----------------debug
-    open(my $dfhr,"< $dumper") or die "Cant open $dumper: $!";
-    local $/ = undef;  # read whole file
+    say colored(['black on_yellow'], ' deserializng:') . "dumper"; #----------------debug
+    open($dfhr,"< $dumper") or die "Cant open $dumper: $!";
+    undef $/;   
+#    say colored(['blue'],<$dfhr>);
     eval <$dfhr>;
     close $dfhr;
-};
 
 # --search appids
 my $search = sub {
     my $filter = shift;
-    my @filter = ();
     say colored(['black on_yellow'], ' $search:') . "$filter"; #----------------debug
     $filter = qr/$filter/;
-    @filter = grep { $_->{"apid"} =~ /$filter/ } @app;
+    my @filter = grep { $_->{"apid"} =~ /$filter/ } @app;
     return \@filter;
 };      
 
@@ -96,10 +95,10 @@ my $check = sub {
 };  
 
 my $init = sub {
-    my %app = ();
     say colored(['black on_yellow'], ' $init:') . "..."; #----------------debug
     find( sub{ 
-        if(/Library\/Preferences\/.*\.plist/){
+        my %app = ();
+        if( "$File::Find::dir/$_" =~ /Library\/Preferences\/.*\.plist/){
             say "match"; #----------------------------------debug
             my $match = "$File::Find::dir/$_";
             $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
@@ -110,7 +109,7 @@ my $init = sub {
             $app{uuid} = $3;
             push @app,{%app};
             $apnr++;
-        }
+        } else { print "$_ \," }
     },  @base );
 };
 
@@ -121,20 +120,14 @@ sub option {
 
     # initialize (-i)
     if(defined $option->{i}){
-        $init->(); serialize(); deserialize() and say " option\$option->{i} \$init->(); serialize()..."; 
-        say @app;
+        $init->(); serialize() and say " option\$option->{i} \$init->(); serialize()..."; 
+        say Dumper(@app);
 
     } 
     # search (-s keyword) 
     elsif(defined $option->{s}){
-        deserialize();
-        my $s = $search->($option->{s});
-        say "\$option->(s): say \$_->{apnr} ..."; 
-        print Dumper($s);
-
-        #for(@$s){
-        #    say 'search results: ' . $_->{apid};
-        #}
+        #say @app;
+        say Dumper($search->($option->{s}));
     } 
 }
 option();
@@ -162,7 +155,7 @@ option();
 -map alias and $variable
 =item C<alios [-m] [nr appname]>
 
-- inifialize
+- initialize
 =item C<alios [-i]>
 
 =back
