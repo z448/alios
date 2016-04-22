@@ -64,7 +64,9 @@ sub serialize {
 # --dumper read
     say colored(['black on_yellow'], ' deserializng:') . "dumper"; #----------------debug
     open($dfhr,"< $dumper") or die "Cant open $dumper: $!";
-    undef $/;   
+    local $/ = undef;
+    
+   # undef $/;   
 #    say colored(['blue'],<$dfhr>);
     eval <$dfhr>;
     close $dfhr;
