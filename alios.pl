@@ -14,29 +14,18 @@ use JSON qw< encode_json decode_json>;
 use open qw< :encoding(UTF-8) >;
 
 my $option = {};
-getopts('s:m:f:p:i', $option);
+getopts('s:m:f:pi', $option);
 my $apnr = 0;
-my ($a, $dfhr, $dumper, $app, $config, @app, @base, $store, $json) = ();
+my ( $dfhr, $dumper, $app, $config, @app, @base, $store, $json ) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 $dumper = "$ENV{HOME}/.alios.dmp";
-$json = "$ENV{HOME}/.alios.json";
+$json = "./.alios.json";
 $config = "./config";
 
-=head1
-my $conf = {};  
-$conf->{base}= \@base;
-$conf->{store}=$store;
-$conf->{json}=$json;
-
-open(my $fh, ">",$config) or die "$! cant open: $config";
-print $fh $conf;
-close $fh;
-=cut
-
 my $init = sub {
-    say colored(['black on_yellow'], ' $init:') . "..."; #----------------debug
+    say colored(['black on_yellow'], " init:"); #----------------debug
     find( sub{ 
         my %app = ();
         if( "$File::Find::dir/$_" =~ /Library\/Preferences\/.*\.plist/){
@@ -55,23 +44,21 @@ my $init = sub {
 
 my $repath = sub {
     my $broken = shift;
-    say colored(['black on_yellow'], ' $repath:') . ""; #---------------debug
+    say colored(['black on_yellow'], " repath:"); #---------------debug
     say "broken links:";
     for(@$broken){
         print colored(['black on_red'], "\t" . $_->{apid});
     }
-    say colored(['white on_yellow'], ' $init->(), deserialize()') . ""; #---------------debug
+    say colored(['white on_yellow'], " init, deserialize"); #---------------debug
     $init->(), serialize(); deserialize();
-
 };
 
 my $check = sub {
-    say colored(['black on_yellow'], ' $check:') . "plists"; #----------------debug
+    say colored(['black on_yellow'], " check:"); #----------------debug
     my @broken = ();
     for( @app ){
         if( ! -f $_->{plist}){
-            # ------------------------todo: create $repath->($_->{plist})
-            say colored(['yellow'], $_->{apid} . ' >> ' . 'path broken');
+            say colored(['yellow'], $_->{apid});
             push @broken, $_;
         }
     }
@@ -81,32 +68,10 @@ my $check = sub {
 
 sub serialize {
 # --json write
-    say colored(['black on_yellow'], ' $serialize:') . "json"; #---------------debug
+    say colored(['black on_yellow'], " serialize:") . "json"; #---------------debug
     open(my $jfh,">",$json) || die "cant open $json: $!";
     my $j = encode_json \@app;
     print $jfh $j;
-    close $jfh; 
-    undef $jfh; 
-
-# --dumper write
-    $Data::Dumper::Purity = 1;
-    say colored(['black on_yellow'], ' serialize:') . "dumper"; #----------------debug
-    open(my $dfh, ">",$dumper) || die "cant open $dumper: $!";
-    print $dfh Data::Dumper->Dump([ \@app ],['app']);
-    close $dfh;
-}  
-
-=head1
-# --dumper read
-    say colored(['black on_yellow'], ' deserializng:') . "dumper"; #----------------debug
-    open($dfhr,"< $dumper") or die "Cant open $dumper: $!";
-    local $/ = undef;
-    
-   # undef $/;   
-    say colored(['blue'],<$dfhr>);
-    print eval{ <$dfhr> };  # ------------------------???????????????????????????????
-    close $dfhr;
-=cut
 
 # --json read
 sub deserialize {
@@ -118,47 +83,28 @@ sub deserialize {
 }
 
 say colored(['yellow'],'deserialized') if deserialize();
-# say @{deserialize()} #-------------to list all hash ref 
+say @{deserialize()}; #-------------to list all hash ref 
 
 # --search appids
 my $search = sub {
     my $filter = shift;
-    say colored(['black on_yellow'], ' $search:') . "$filter"; #----------------debug
+    say colored(['black on_yellow'], " search:") . "filter"; #----------------debug
     $filter = lc qr/$filter/;
     my @filter = grep { lc $_->{"apid"} =~ /$filter/ } @app;
     return \@filter;
 };      
 
+say colored(['black on_yellow'], "  option:") . '...'; #----------------debug
 
-# --check for broken links
-#say "check" unless ($check->());
-
-sub option {
-    say colored(['black on_yellow'], '  option:') . "..."; #----------------debug
-
-    # initialize (-i)
-    if(defined $option->{i}){
-        $init->(); serialize() and say " option\$option->{i} \$init->(); serialize()..."; 
-        say Dumper(@app);
-
-    } 
-    # search (-s keyword) 
-    elsif(defined $option->{s}){
-        #say @app;
-        say Dumper($search->($option->{s}));
-    } 
-
-    # use -p in ~/.bashrc
-    elsif(defined $option->{p}){
-        $check->();
-    }
-
-    # default (no option)
-    else{
-        # $see->('stored.json');  -------------todo
-    }
+if(defined $option->{i}){
+    $init->(); serialize() and say " option->{i}; init; serialize"; 
+    say Dumper(@app);
+} elsif(defined $option->{s}){
+    say Dumper("$search->($option->{s})");
+} elsif(defined $option->{p}){
+    $check->();
 }
-option();
+__DATA__
 
 =head1 NAME
 
@@ -196,7 +142,4 @@ option();
 =back
 
 =cut
-
-
-
 
