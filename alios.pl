@@ -40,7 +40,6 @@ my $init = sub {
     find( sub{ 
         my %app = ();
         if( "$File::Find::dir/$_" =~ /Library\/Preferences\/.*\.plist/){
-            print " match"; #----------------------------------debug
             my $match = "$File::Find::dir/$_";
             $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
             $app{path} = $1 . $2 . $3 . $4;
@@ -54,7 +53,6 @@ my $init = sub {
     },  @base );
 };
 
-
 my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], ' $repath:') . ""; #---------------debug
@@ -63,8 +61,23 @@ my $repath = sub {
         print colored(['black on_red'], "\t" . $_->{apid});
     }
     say colored(['white on_yellow'], ' $init->(), deserialize()') . ""; #---------------debug
-    $init->(), deserialize();
+    $init->(), serialize(); deserialize();
+
 };
+
+my $check = sub {
+    say colored(['black on_yellow'], ' $check:') . "plists"; #----------------debug
+    my @broken = ();
+    for( @app ){
+        if( ! -f $_->{plist}){
+            # ------------------------todo: create $repath->($_->{plist})
+            say colored(['yellow'], $_->{apid} . ' >> ' . 'path broken');
+            push @broken, $_;
+        }
+    }
+    $repath->(\@broken);
+};  
+
 
 sub serialize {
 # --json write
@@ -104,8 +117,8 @@ sub deserialize {
     return \@app;
 }
 
-say colored(['red'],deserialize());
-say colored(['green'],@{deserialize()});
+say colored(['yellow'],'deserialized') if deserialize();
+# say @{deserialize()} #-------------to list all hash ref 
 
 # --search appids
 my $search = sub {
@@ -116,21 +129,8 @@ my $search = sub {
     return \@filter;
 };      
 
-my $check = sub {
-    say colored(['black on_yellow'], ' $check:') . "plists"; #----------------debug
-    my @broken = ();
-    for( @app ){
-        if( ! -f $_->{plist}){
-            # ------------------------todo: create $repath->($_->{plist})
-            say colored(['yellow'], $_->{apid} . ' >> ' . 'path broken');
-            push @broken, $_;
-        }
-    }
-    $repath->(\@broken);
-};  
 
 # --check for broken links
-$check->();
 #say "check" unless ($check->());
 
 sub option {
@@ -147,6 +147,11 @@ sub option {
         #say @app;
         say Dumper($search->($option->{s}));
     } 
+
+    # use -p in ~/.bashrc
+    elsif(defined $option->{p}){
+        $check->();
+    }
 }
 option();
 
