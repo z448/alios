@@ -37,16 +37,16 @@ close $fh;
 
 my $repath = sub {
     my $broken = shift;
-    say colored(['black on_yellow'], '$repath: ->') . ""; #---------------debug
+    say colored(['black on_yellow'], ' $repath:') . ""; #---------------debug
     say "broken links:";
     for(@$broken){
         say $_->{apid};
     }
 };
 
-my $serialize = sub {
+sub serialize {
 # --json write
-    say colored(['black on_yellow'], '$serialize: ->') . "json"; #---------------debug
+    say colored(['black on_yellow'], ' $serialize:') . "json"; #---------------debug
     open(my $jfh,">",$json) || die "cant open $json: $!";
     my $jay = encode_json \@app;
     print $jfh $jay;
@@ -54,31 +54,28 @@ my $serialize = sub {
     $jfh = undef;
 
 # --dumper write
-    say colored(['black on_yellow'], '$serialize: ->') . "dumper"; #----------------debug
+    say colored(['black on_yellow'], ' serialize:') . "dumper"; #----------------debug
     open(my $dfh, ">",$dumper) || die "cant open $dumper: $!";
     print $dfh Data::Dumper->Dump([ \@app ],['app']);
     close $dfh;
-};  
+}  
 
 # --dumper read
-my $deserialize = sub {
-    my $a = [];
-    say colored(['black on_yellow'], '$deserialize: ->') . "dumper"; #----------------debug
+sub deserialize {
+    say colored(['black on_yellow'], ' deserialize():') . "dumper"; #----------------debug
     open(my $dfhr,"< $dumper") or die "Cant open $dumper: $!";
-#or close $dfh_r and say "cant open $dumper:$!\n reserialze..." and $serialize->() and return; 
     local $/ = undef;  # read whole file
-    $a = <$dfhr>;
-    #close $dfh_r;
-    return @{ eval @$a };
+    eval <$dfhr>;
+    close $dfhr;
 };
-say $deserialize->() and die;
 
 # --search appids
 my $search = sub {
     my $filter = shift;
-    say colored(['black on_yellow'], '$search: ->') . "$filter"; #----------------debug
+    my @filter = ();
+    say colored(['black on_yellow'], ' $search:') . "$filter"; #----------------debug
     $filter = qr/$filter/;
-    my @filter = grep { $_->{"apid"} =~ /$filter/ } @{$deserialize->()};
+    @filter = grep { $_->{"apid"} =~ /$filter/ } @app;
     return \@filter;
 };      
 
@@ -86,9 +83,9 @@ my $search = sub {
 #say  $_->{apid} for(@{$search->($option->{s})});
 
 my $check = sub {
-    say colored(['black on_yellow'], '$check: ->') . "plists"; #----------------debug
+    say colored(['black on_yellow'], ' $check:') . "plists"; #----------------debug
     my @broken = ();
-    for( @{$deserialize->()} ){
+    for( @app ){
         if( ! -f $_->{plist}){
             # ------------------------todo: create $repath->($_->{plist})
             say colored(['yellow'], $_->{apid} . ' >> ' . 'path broken');
@@ -99,11 +96,11 @@ my $check = sub {
 };  
 
 my $init = sub {
-    say colored(['black on_yellow'], '$init: ->') . "..."; #----------------debug
+    my %app = ();
+    say colored(['black on_yellow'], ' $init:') . "..."; #----------------debug
     find( sub{ 
-        my %app = ();
-        my $plist_path = "$File::Find::dir/$_";
-        if($plist_path =~ /Library\/Preferences\/.*\.plist/){
+        if(/Library\/Preferences\/.*\.plist/){
+            say "match"; #----------------------------------debug
             my $match = "$File::Find::dir/$_";
             $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
             $app{path} = $1 . $2 . $3 . $4;
@@ -117,17 +114,20 @@ my $init = sub {
     },  @base );
 };
 
-say "check" unless ($check->());
+#say "check" unless ($check->());
 
 sub option {
-    say colored(['black on_yellow'], ' option: ->') . "..."; #----------------debug
+    say colored(['black on_yellow'], '  option:') . "..."; #----------------debug
 
     # initialize (-i)
     if(defined $option->{i}){
-        $init->(); $serialize->() and say " option\$option->{i} \$init->(); \$serialize->()..."; 
+        $init->(); serialize(); deserialize() and say " option\$option->{i} \$init->(); serialize()..."; 
+        say @app;
+
     } 
     # search (-s keyword) 
     elsif(defined $option->{s}){
+        deserialize();
         my $s = $search->($option->{s});
         say "\$option->(s): say \$_->{apnr} ..."; 
         print Dumper($s);
