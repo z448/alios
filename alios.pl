@@ -72,6 +72,7 @@ sub serialize {
     open(my $jfh,">",$json) || die "cant open $json: $!";
     my $j = encode_json \@app;
     print $jfh $j;
+}
 
 # --json read
 sub deserialize {
@@ -94,10 +95,10 @@ my $search = sub {
     return \@filter;
 };      
 
-say colored(['black on_yellow'], "  option:") . '...'; #----------------debug
+say colored(['black on_yellow'], "  option:");#----------------debug
 
 if(defined $option->{i}){
-    $init->(); serialize() and say " option->{i}; init; serialize"; 
+    $init->(); serialize() and say "init; serialize"; 
     say Dumper(@app);
 } elsif(defined $option->{s}){
     say Dumper("$search->($option->{s})");
