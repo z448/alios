@@ -14,7 +14,7 @@ use JSON qw< encode_json decode_json>;
 use open qw< :encoding(UTF-8) >;
 
 my $option = {};
-getopts('s:m:f:i', $option);
+getopts('s:m:f:p:i', $option);
 my $apnr = 0;
 my ($a, $dfhr, $dumper, $app, $config, @app, @base, $store, $json) = ();
 
@@ -151,6 +151,11 @@ sub option {
     # use -p in ~/.bashrc
     elsif(defined $option->{p}){
         $check->();
+    }
+
+    # default (no option)
+    else{
+        # $see->('stored.json');  -------------todo
     }
 }
 option();
