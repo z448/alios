@@ -16,7 +16,7 @@ use open qw< :encoding(UTF-8) >;
 my $option = {};
 getopts('s:m:f:i', $option);
 my $apnr = 0;
-my ($dfhr, $dumper, $app, $config, @app, @base, $store, $json) = ();
+my ($a, $dfhr, $dumper, $app, $config, @app, @base, $store, $json) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
@@ -62,14 +62,16 @@ sub serialize {
 }  
 
 # --dumper read
+{
     say colored(['black on_yellow'], ' deserializng:') . "dumper"; #----------------debug
     open($dfhr,"< $dumper") or die "Cant open $dumper: $!";
     local $/ = undef;
     
    # undef $/;   
-#    say colored(['blue'],<$dfhr>);
-    eval <$dfhr>;
+    say colored(['blue'],<$dfhr>);
+    eval <$dfhr>;  # ------------------------???????????????????????????????
     close $dfhr;
+}
 
 # --search appids
 my $search = sub {
