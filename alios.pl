@@ -79,31 +79,29 @@ sub deserialize {
     open(my $jfh,"<","$json");
     local $\ = undef;
     my $j = <$jfh>;
-    @app = decode_json $j;
-    return \@app;
+    my $p = decode_json $j;
+    return \@$p;
 }
 
-say colored(['yellow'],'deserialized') if deserialize();
-say @{deserialize()}; #-------------to list all hash ref 
+#say colored(['yellow'],'deserialized') if deserialize();
+#say @{deserialize()}; #-------------to list all hash ref 
 
 # --search appids
 my $search = sub {
     my $filter = shift;
     say colored(['black on_yellow'], " search:") . "filter"; #----------------debug
-    $filter = lc qr/$filter/;
-    my @filter = grep { lc $_->{"apid"} =~ /$filter/ } @app;
-    say @filter;
+    $filter = lc qr/$option->{s}/;
+    my @filter = grep { lc $_->{apid} =~ /$filter/ } @app;
     return \@filter;
 };      
 
 say colored(['black on_yellow'], "  option:");#----------------debug
-
 if(defined $option->{i}){
     $init->(); serialize() and say "init; serialize"; 
     say Dumper(@app);
 } elsif(defined $option->{s}){
-    say deserialize();
-    $search->($option->{s});
+    deserialize();
+    print Dumper($search->());
 } elsif(defined $option->{p}){
     $check->();
 }
