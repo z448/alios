@@ -21,7 +21,7 @@ my ( $dfhr, $dumper, $app, $config, @app, @base, $store, $json ) = ();
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 $dumper = "$ENV{HOME}/.alios.dmp";
-$json = "./.alios.json";
+$json = "$ENV{HOME}/.alios.json";
 $config = "./config";
 
 my $init = sub {
@@ -79,7 +79,7 @@ sub deserialize {
     open(my $jfh,"<","$json");
     local $\ = undef;
     my $j = <$jfh>;
-    @app = @{decode_json $j};
+    @app = decode_json $j;
     return \@app;
 }
 
@@ -92,6 +92,7 @@ my $search = sub {
     say colored(['black on_yellow'], " search:") . "filter"; #----------------debug
     $filter = lc qr/$filter/;
     my @filter = grep { lc $_->{"apid"} =~ /$filter/ } @app;
+    say @filter;
     return \@filter;
 };      
 
@@ -101,7 +102,8 @@ if(defined $option->{i}){
     $init->(); serialize() and say "init; serialize"; 
     say Dumper(@app);
 } elsif(defined $option->{s}){
-    say Dumper("$search->($option->{s})");
+    say deserialize();
+    $search->($option->{s});
 } elsif(defined $option->{p}){
     $check->();
 }
