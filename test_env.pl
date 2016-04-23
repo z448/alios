@@ -7,21 +7,18 @@ use Data::Dumper;
 
 my $switch = $ARGV[0] || 'create';
 my $contain = "Container";
-my $container="Container/Data/Application/FC3256EE-C34F-FC21-AS45-FC3256EE/Library/Preferences";
+my @containers = ("Container/Data/Application/FC3256EE-C34F-FC21-AS45-FC3256EE/Library/Preferences", "Container/Shared/AppGroup/F34F5232-C34F-FC21-AS45-FC3256EE/Library/Preferences");
 my $plist = "test.alios.plist";
 
 if($switch eq '-d'){
-    unlink("$ENV{HOME}/$container/$switch");
-    remove_tree("$ENV{HOME}/$contain") or die "$!";
-    print "removed: $contain";
+        remove_tree("$ENV{HOME}/$contain") or die "$!";
+        print "removed: $contain";
 } elsif($switch eq 'create'){
-    make_path("$ENV{HOME}/$container");
-    open(my $fh, ">:encoding(UTF-8)", "$ENV{HOME}/$container/$plist");
-    print $fh 'alios test';
-    close $fh;
-    print "created: "  . $container . '/' . $plist . "\n";
+    for(@containers){
+        make_path("$ENV{HOME}/$_");
+        open(my $fh, ">:encoding(UTF-8)", "$ENV{HOME}/$_/$plist");
+        print $fh 'alios test';
+        close $fh;
+        say "created: $_/$plist";
+    }
 }
-
-
-
-
