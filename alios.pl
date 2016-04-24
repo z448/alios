@@ -14,7 +14,7 @@ use JSON qw< encode_json decode_json>;
 use open qw< :encoding(UTF-8) >;
 
 my $option = {};
-getopts('s:m:n:f:pi', $option);
+getopts('sm:n:f:pi', $option);
 my $apnr = 0;
 my ( $alios, $dfhr, $dumper, $app, $config, @app, @base, $store, $json ) = ();
 
@@ -118,17 +118,27 @@ my $search = sub {
     }
 };      
 
+my $see = sub {
+        my @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
+        for(@filter){
+            say $_->{apid} . colored(['yellow'], "_") . colored(['black on_yellow'], " $_->{apnr}"); 
+        }
+};
+    
+
 say colored(['black on_yellow'], "  option:");#----------------debug
 if(defined $option->{i}){
     $init->(); serialize() and say "init; serialize"; 
     say Dumper(deserialize());
-} elsif(defined $option->{s}){
+} elsif(defined $option->{f}){
     deserialize();
-    print Dumper($search->($option->{s}));
+    print Dumper($search->($option->{f}));
 } elsif(defined $option->{p}){
     $check->();
 } elsif(defined $option->{m}){
     say Dumper($search->($option->{m}, $option->{n}));
+} elsif(defined $option->{s}){
+    say Dumper($see->());
 }
 
 
