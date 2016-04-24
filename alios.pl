@@ -87,16 +87,6 @@ sub deserialize {
 #say colored(['yellow'],'deserialized') if deserialize();
 #say @{deserialize()}; #-------------to list all hash ref 
 
-sub maps {
-    my $apid = shift;
-    if( $apid =~ /\d+\-.*/){ 
-        $apid =~ s/(\d+)\-(.*)/$1$2/;
-        say "$1" . ' >> ' . "$2";
-    } else { say " syntax: alios -m 123-appName"; }
-}
-
-
-
 # --search appids
 my $search = sub {
     my $filter = shift;
