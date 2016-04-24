@@ -49,7 +49,6 @@ my $repath = sub {
     for(@$broken){
         print colored(['black on_red'], "\t" . $_->{apid});
     }
-    say colored(['white on_yellow'], " init, deserialize"); #---------------debug
     $init->(), serialize(); deserialize();
 };
 
@@ -62,7 +61,9 @@ my $check = sub {
             push @broken, $_;
         }
     }
-    $repath->(\@broken);
+    if (@broken){
+        $repath->(\@broken) 
+    } else { say "no broken links" and return; }
 };  
 
 
@@ -91,14 +92,14 @@ my $search = sub {
     my $filter = shift;
     say colored(['black on_yellow'], " search:") . "filter"; #----------------debug
     $filter = lc qr/$option->{s}/;
-    my @filter = grep { lc $_->{apid} =~ /$filter/ } @app;
+    my @filter = grep { lc $_->{apid} =~ /$filter/ } @{deserialize()};
     return \@filter;
 };      
 
 say colored(['black on_yellow'], "  option:");#----------------debug
 if(defined $option->{i}){
     $init->(); serialize() and say "init; serialize"; 
-    say Dumper(@app);
+    #say Dumper(deserialize());
 } elsif(defined $option->{s}){
     deserialize();
     print Dumper($search->());
@@ -118,6 +119,10 @@ __DATA__
 =head1 SYNOPSIS
 
 =over 16
+
+-force init
+
+=item C<alios -i>
 
 -source from ~/.bashrc or ~/.bash_profile
 
