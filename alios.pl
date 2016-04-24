@@ -14,7 +14,7 @@ use JSON qw< encode_json decode_json>;
 use open qw< :encoding(UTF-8) >;
 
 my $option = {};
-getopts('s:m:f:pi', $option);
+getopts('s:m:n:f:pi', $option);
 my $apnr = 0;
 my ( $dfhr, $dumper, $app, $config, @app, @base, $store, $json ) = ();
 
@@ -100,9 +100,24 @@ sub maps {
 # --search appids
 my $search = sub {
     my $filter = shift;
+    my $name = shift;
+    my @filter = ();
+
+    if( $filter =~ /\d+/){
+        @filter = grep { $_->{apnr} eq $filter } @{deserialize()};
+        for(@filter){
+            if(defined $option->{n}){
+                $_->{name} = $name;
+            } else {
+                $name = $_->{apid}; $name =~ s/(.*\.)(.*)/$2/;
+                $_->{name} = $name;
+            }
+        }
+    return \@filter;
+    }
     say colored(['black on_yellow'], " search:") . "filter"; #----------------debug
     $filter = lc qr/$option->{s}/;
-    my @filter = grep { lc $_->{apid} =~ /$filter/ } @{deserialize()};
+    @filter = grep { lc $_->{apid} =~ /$filter/ } @{deserialize()};
     return \@filter;
 };      
 
@@ -116,7 +131,7 @@ if(defined $option->{i}){
 } elsif(defined $option->{p}){
     $check->();
 } elsif(defined $option->{m}){
-    print maps($option->{m});
+    say Dumper($search->($option->{m}, $option->{n}));
 }
 __DATA__
 
