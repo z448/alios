@@ -87,6 +87,16 @@ sub deserialize {
 #say colored(['yellow'],'deserialized') if deserialize();
 #say @{deserialize()}; #-------------to list all hash ref 
 
+sub maps {
+    my $apid = shift;
+    if( $apid =~ /\d+\-.*/){ 
+        $apid =~ s/(\d+)\-(.*)/$1$2/;
+        say "$1" . ' >> ' . "$2";
+    } else { say " syntax: alios -m 123-appName"; }
+}
+
+
+
 # --search appids
 my $search = sub {
     my $filter = shift;
@@ -99,12 +109,14 @@ my $search = sub {
 say colored(['black on_yellow'], "  option:");#----------------debug
 if(defined $option->{i}){
     $init->(); serialize() and say "init; serialize"; 
-    #say Dumper(deserialize());
+    say Dumper(deserialize());
 } elsif(defined $option->{s}){
     deserialize();
     print Dumper($search->());
 } elsif(defined $option->{p}){
     $check->();
+} elsif(defined $option->{m}){
+    print maps($option->{m});
 }
 __DATA__
 
