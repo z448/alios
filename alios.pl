@@ -16,13 +16,15 @@ use open qw< :encoding(UTF-8) >;
 my $option = {};
 getopts('s:m:n:f:pi', $option);
 my $apnr = 0;
-my ( $dfhr, $dumper, $app, $config, @app, @base, $store, $json ) = ();
+my ( $alios, $dfhr, $dumper, $app, $config, @app, @base, $store, $json ) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 $dumper = "$ENV{HOME}/.alios.dmp";
 $json = "$ENV{HOME}/.alios.json";
 $config = "./config";
+$alios = ".alios";
+
 
 my $init = sub {
     say colored(['black on_yellow'], " init:"); #----------------debug
@@ -102,6 +104,10 @@ my $search = sub {
                 $name = $_->{apid}; $name =~ s/(.*\.)(.*)/$2/;
                 $_->{name} = $name;
             }
+        open(my $fh, ">", $alios);
+        say $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"';
+        say $fh uc($_->{name}). '=' . $_->{path};
+        say $fh $_->{name} . '=' . $_->{apid};
         }
     return \@filter;
     }
@@ -123,6 +129,8 @@ if(defined $option->{i}){
 } elsif(defined $option->{m}){
     say Dumper($search->($option->{m}, $option->{n}));
 }
+
+
 __DATA__
 
 =head1 NAME
@@ -131,7 +139,7 @@ __DATA__
 
 =item alios - jump over iOS application UUIDs 
 
-=back
+back
 
 =head1 SYNOPSIS
 
