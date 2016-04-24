@@ -104,17 +104,18 @@ my $search = sub {
                 $name = $_->{apid}; $name =~ s/(.*\.)(.*)/$2/;
                 $_->{name} = $name;
             }
-        open(my $fh, ">", $alios);
-        say $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"';
-        say $fh uc($_->{name}). '=' . $_->{path};
-        say $fh $_->{name} . '=' . $_->{apid};
+        open(my $fh, ">>", $alios);
+        print $fh uc($_->{name}). '=' . $_->{path} . ';';
+        print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
+        print $fh $_->{name} . '=' . $_->{apid} . "\n";
+        close $fh;
         }
-    return \@filter;
+        return \@filter;
+    } else {
+        $filter = lc qr/$filter/;
+        @filter = grep { lc $_->{apid} =~ /$filter/ } @{deserialize()};
+        return \@filter;
     }
-    say colored(['black on_yellow'], " search:") . "filter"; #----------------debug
-    $filter = lc qr/$option->{s}/;
-    @filter = grep { lc $_->{apid} =~ /$filter/ } @{deserialize()};
-    return \@filter;
 };      
 
 say colored(['black on_yellow'], "  option:");#----------------debug
@@ -123,7 +124,7 @@ if(defined $option->{i}){
     say Dumper(deserialize());
 } elsif(defined $option->{s}){
     deserialize();
-    print Dumper($search->());
+    print Dumper($search->($option->{s}));
 } elsif(defined $option->{p}){
     $check->();
 } elsif(defined $option->{m}){
@@ -145,7 +146,7 @@ back
 
 =over 16
 
--force init
+force init
 
 =item C<alios -i>
 
