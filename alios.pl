@@ -16,14 +16,14 @@ use open qw< :encoding(UTF-8) >;
 my $option = {};
 getopts('sm:n:f:pi', $option);
 my $apnr = 0;
-my ( $alios, $dfhr, $dumper, $app, $config, @app, @base, $store, $json ) = ();
+my ( $alios_json, $alios, $dfhr, $app, @app, @base, $store, $cache ) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
-$dumper = "$ENV{HOME}/.alios.dmp";
-$json = "$ENV{HOME}/.alios.json";
-$config = "./config";
-$alios = ".alios";
+$cache = "$ENV{HOME}/.alios.cache.json";
+$alios = "$ENV{HOME}/.alios";
+$alios_json = "$ENV{HOME}/.alios.json";
+
 
 
 my $init = sub {
@@ -72,19 +72,30 @@ my $check = sub {
 sub serialize {
 # --json write
     say colored(['black on_yellow'], " serialize:") . "json"; #---------------debug
-    open(my $jfh,">",$json) || die "cant open $json: $!";
+    open(my $jfh,">",$cache) || die "cant open $cache: $!";
     my $j = encode_json \@app;
     print $jfh $j;
 }
 
 # --json read
 sub deserialize {
-    open(my $jfh,"<","$json");
+    open(my $jfh,"<",$cache);
     local $\ = undef;
     my $j = <$jfh>;
     my $p = decode_json $j;
     return \@$p;
 }
+
+sub del {
+    open(my $xfh, "<:encoding(UTF-8)", $alios_json);
+    my $j = decode_json <$xfh>;
+    for(@$j){
+        say colored(['white on_red'], $_->{apid});
+    }
+    close $xfh;
+}
+del();
+
 
 #say colored(['yellow'],'deserialized') if deserialize();
 #say @{deserialize()}; #-------------to list all hash ref 
@@ -95,7 +106,9 @@ my $search = sub {
     my $name = shift;
     my @filter = ();
 
-    if( $filter =~ /\d+/){
+    if( defined $option->{m}){
+        open(my $fh,"<",$alios_json);
+        close $fh;
         @filter = grep { $_->{apnr} eq $filter } @{deserialize()};
         for(@filter){
             if(defined $option->{n}){
@@ -110,6 +123,9 @@ my $search = sub {
         print $fh $_->{name} . '=' . $_->{apid} . "\n";
         close $fh;
         }
+        open($fh,">>",$alios_json);
+        print $fh encode_json \@filter;
+        close $fh;
         return \@filter;
     } else {
         $filter = lc qr/$filter/;
@@ -133,7 +149,6 @@ if(defined $option->{i}){
     $init->(); serialize() and say "init; serialize"; 
     say Dumper(deserialize());
 } elsif(defined $option->{f}){
-    deserialize();
     print Dumper($search->($option->{f}));
 } elsif(defined $option->{p}){
     $check->();
