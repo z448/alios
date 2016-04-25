@@ -123,7 +123,7 @@ my $see = sub {
         for(@filter){
             my $ln = length $_->{apid};
             my $tail = $_->{apid}; $tail =~ s/(.*\.)(.*)/$2/;
-            say " " x $ln . "$tail" . colored(['yellow'], "_") . colored(['black on_yellow'], " $_->{apnr}"); 
+            say " " x $ln . "$tail" . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{apnr}"); 
         }
 };
     
