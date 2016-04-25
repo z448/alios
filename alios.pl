@@ -121,7 +121,9 @@ my $search = sub {
 my $see = sub {
         my @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
         for(@filter){
-            say $_->{apid} . colored(['yellow'], "_") . colored(['black on_yellow'], " $_->{apnr}"); 
+            my $ln = length $_->{apid};
+            my $tail = $_->{apid}; $tail =~ s/(.*\.)(.*)/$2/;
+            say " " x $ln . "$tail" . colored(['yellow'], "_") . colored(['black on_yellow'], " $_->{apnr}"); 
         }
 };
     
