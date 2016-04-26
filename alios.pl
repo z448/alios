@@ -93,23 +93,20 @@ sub del {
     close $fh;
 }
 
-sub write_alios {
-    my ($filter, $delete) = @_;
-    say "write_alios: filter is: " . @$filter;
-    say "delete is: $delete" and die;
+my $write_alios = sub {
+    my $write = shift;
      
     # write old+new values into $alios_json
     open(my $fh,">",$alios_json) || "cant open $alios_json:$!";
-    print $fh encode_json \@$filter;
+    print $fh encode_json $write;
     close $fh;
-    #return $delete;
-}
+};
 
 # --searchmap appids
 my $searchmap = sub {
     my $filter = shift;
     my $name = shift;
-    my @filter = ();
+    my (@filter, @alios) = ();
 
     # read stored values; todo: delete from stored values
     open(my $fh,"<",$alios_json) || die "cant open $alios_json:$!";
@@ -119,30 +116,29 @@ my $searchmap = sub {
     
     # delete entry from $alios_json
     if(defined $option->{d}){
-        my @delete = grep { $_->{name} eq $filter } @filter;
-        for(@delete){ undef $_ }
-    }
+        @alios = grep { $_->{name} ne $filter } @filter;
+        say $write_alios->(\@alios);
+    } 
+    elsif( defined $option->{m} and defined $option->{n}){
+        my @f = grep { $_->{apnr} eq $filter } @{deserialize()};
+        for(@f){
+                if(defined $option->{n}){
+                    $_->{name} = $name;
+                } else {
+                    $name = $_->{apid}; $name =~ s/(.*\.)(.*)/$2/;
+                    $_->{name} = $name;
+                }
+                # concatenate stored $alios_json w/ new map
+                @filter = (@filter, @f);
 
-    if( defined $option->{m} and defined $option->{n}){
-    my @f = grep { $_->{apnr} eq $filter } @{deserialize()};
-    for(@f){
-            if(defined $option->{n}){
-                $_->{name} = $name;
-            } else {
-                $name = $_->{apid}; $name =~ s/(.*\.)(.*)/$2/;
-                $_->{name} = $name;
-            }
-            # concatenate stored $alios_json w/ new map
-            @filter = (@filter, @f);
-
-            # write to shell env $alios
-            open(my $fh, ">>", $alios) || "cant open $alios:$!";
-            print $fh uc($_->{name}). '=' . $_->{path} . ';';
-            print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
-            print $fh $_->{name} . '=' . $_->{apid} . "\n";
-            close $fh;
-    }
-    write_alios(\@filter, \@f); #############FINISH######################
+                # write to shell env $alios
+                open(my $fh, ">>", $alios) || "cant open $alios:$!";
+                print $fh uc($_->{name}). '=' . $_->{path} . ';';
+                print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
+                print $fh $_->{name} . '=' . $_->{apid} . "\n";
+                close $fh;
+                say $write_alios->(\@filter);
+        }
     } else {
         # trigered w/ -s option, list apid/apnr tree
         $filter = lc qr/$filter/;
@@ -175,7 +171,7 @@ if(defined $option->{i}){
 } elsif(defined $option->{s}){
     say Dumper($search->());
 } elsif(defined $option->{d}){
-    say Dumper($option->{d});
+    say Dumper($searchmap->($option->{d}));
 }
 
 
