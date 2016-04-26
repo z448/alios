@@ -24,8 +24,6 @@ $cache = "$ENV{HOME}/.alios.cache.json";
 $alios = "$ENV{HOME}/.alios";
 $alios_json = "$ENV{HOME}/.alios.json";
 
-
-
 my $init = sub {
     say colored(['black on_yellow'], " init:"); #----------------debug
     find( sub{ 
@@ -101,35 +99,42 @@ my $searchmap = sub {
     my $name = shift;
     my @filter = ();
 
-    if($filter eq 'TEST'){
-        open(my $fh,"<",$alios_json) || die "cant open $alios_json:$!";
-        my $j = <$fh>;
-        my $p  = decode_json $j;
-        print $p and die;
-    }
+    # read stored values; todo: delete from stored values
+    open(my $fh,"<",$alios_json) || die "cant open $alios_json:$!";
+    my $j = <$fh>;
+    @filter = @{ decode_json $j };
+    close $fh;
 
-    if( defined $option->{m}){
-        @filter = grep { $_->{apnr} eq $filter } @{deserialize()};
-        for(@filter){
+    if( defined $option->{m} and defined $option->{n}){
+        my @f = grep { $_->{apnr} eq $filter } @{deserialize()};
+        for(@f){
             if(defined $option->{n}){
                 $_->{name} = $name;
             } else {
                 $name = $_->{apid}; $name =~ s/(.*\.)(.*)/$2/;
                 $_->{name} = $name;
             }
-        open(my $fh, ">>", $alios);
-        print $fh uc($_->{name}). '=' . $_->{path} . ';';
-        print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
-        print $fh $_->{name} . '=' . $_->{apid} . "\n";
-        close $fh;
-        }
-        open(my $fh,">>",$alios_json);
-        print $fh encode_json \@filter;
-        close $fh;
-        return \@filter;
+            # concatenate stored $alios_json w/ new map
+            @filter = (@filter, @f);
+
+            # write to shell env $alios
+            open(my $fh, ">>", $alios);
+            print $fh uc($_->{name}). '=' . $_->{path} . ';';
+            print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
+            print $fh $_->{name} . '=' . $_->{apid} . "\n";
+            close $fh;
+            }
+
+            # write old+new values into $alios_json
+            open(my $fh,">",$alios_json);
+            print $fh encode_json \@filter;
+            close $fh;
+            return \@filter;
     } else {
+        # trigered w/ -s option, list apid/apnr tree
         $filter = lc qr/$filter/;
         @filter = grep { lc $_->{apid} =~ /$filter/ } @{deserialize()};
+        print Dumper(\@filter) and die;
         return \@filter;
     }
 };      
