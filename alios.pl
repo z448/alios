@@ -86,8 +86,6 @@ sub deserialize {
     return \@$p;
 }
 
-=cut
-
 sub del {
     open(my $fh, "<:encoding(UTF-8)", $alios_json);
     my $j = decode_json <$fh>;
@@ -96,24 +94,21 @@ sub del {
     }
     close $fh;
 }
-del();
 
-=cut
-
-
-
-#say colored(['yellow'],'deserialized') if deserialize();
-#say @{deserialize()}; #-------------to list all hash ref 
-
-# --search appids
-my $search = sub {
+# --searchmap appids
+my $searchmap = sub {
     my $filter = shift;
     my $name = shift;
     my @filter = ();
 
+    if($filter eq 'TEST'){
+        open(my $fh,"<",$alios_json) || die "cant open $alios_json:$!";
+        my $j = <$fh>;
+        my $p  = decode_json $j;
+        print $p and die;
+    }
+
     if( defined $option->{m}){
-        open(my $fh,"<",$alios_json);
-        close $fh;
         @filter = grep { $_->{apnr} eq $filter } @{deserialize()};
         for(@filter){
             if(defined $option->{n}){
@@ -128,7 +123,7 @@ my $search = sub {
         print $fh $_->{name} . '=' . $_->{apid} . "\n";
         close $fh;
         }
-        open($fh,">>",$alios_json);
+        open(my $fh,">>",$alios_json);
         print $fh encode_json \@filter;
         close $fh;
         return \@filter;
@@ -139,7 +134,7 @@ my $search = sub {
     }
 };      
 
-my $see = sub {
+my $search = sub {
         my @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
         for(@filter){
             my $ln = length $_->{apid};
@@ -154,13 +149,13 @@ if(defined $option->{i}){
     $init->(); serialize() and say "init; serialize"; 
     say Dumper(deserialize());
 } elsif(defined $option->{f}){
-    print Dumper($search->($option->{f}));
+    print Dumper($searchmap->($option->{f}));
 } elsif(defined $option->{p}){
     $check->();
 } elsif(defined $option->{m}){
-    say Dumper($search->($option->{m}, $option->{n}));
+    say Dumper($searchmap->($option->{m}, $option->{n}));
 } elsif(defined $option->{s}){
-    say Dumper($see->());
+    say Dumper($search->());
 }
 
 
