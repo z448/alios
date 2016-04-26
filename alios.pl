@@ -3,8 +3,8 @@
 use 5.010;
 use warnings;
 use strict;
+
 use File::Find;
-use Storable qw<retrieve store>;
 use Term::ANSIColor;
 use Encode;
 use Data::Dumper;
@@ -77,7 +77,7 @@ sub serialize {
 
 # --json read
 sub deserialize {
-    open(my $jfh,"<",$cache);
+    open(my $jfh,"<",$cache) || die "cant open $cache: $!";
     local $\ = undef;
     my $j = <$jfh>;
     my $p = decode_json $j;
@@ -85,7 +85,7 @@ sub deserialize {
 }
 
 sub del {
-    open(my $fh, "<:encoding(UTF-8)", $alios_json);
+    open(my $fh, "<", $alios_json) || die "cant open $alios_json: $!";
     my $j = decode_json <$fh>;
     for(@$j){
         say colored(['white on_red'], $_->{apid});
@@ -118,7 +118,7 @@ my $searchmap = sub {
             @filter = (@filter, @f);
 
             # write to shell env $alios
-            open(my $fh, ">>", $alios);
+            open(my $fh, ">>", $alios) || "cant open $alios:$!";
             print $fh uc($_->{name}). '=' . $_->{path} . ';';
             print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
             print $fh $_->{name} . '=' . $_->{apid} . "\n";
@@ -126,7 +126,7 @@ my $searchmap = sub {
             }
 
             # write old+new values into $alios_json
-            open(my $fh,">",$alios_json);
+            open(my $fh,">",$alios_json) || "cant open $alios_json:$!";
             print $fh encode_json \@filter;
             close $fh;
             return \@filter;
