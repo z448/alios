@@ -170,7 +170,7 @@ __DATA__
 
 =over 16
 
-=item alios - jump over iOS application UUIDs 
+=item alios - creates aliases/variables for iOS UUID folders 
 
 back
 
@@ -187,13 +187,10 @@ force init
 =item C<alios -p && source ~/.alios>
 
 -search app
-=item C<alios [-s] [keyword]>
+=item C<alios [-f] [keyword]>
 
 -map alias and $variable
-=item C<alios [-m] [nr appname]>
-
-- initialize
-=item C<alios [-i]>
+=item C<alios [-m] nr [-n] appname>
 
 =back
 
@@ -201,7 +198,7 @@ force init
 
 =over 16
 
-=item Loops through application UUIDs in C<~/Container> directories and assign numbers to display IDs which can be used to create L<alias> for directory path that can be used to quickily switch into application directory. Additionaly, env C<$VARIABLE> is created to use in scripts and C<$variable> display id of application to use with other tools such as activator, open etc.
+=item Loops over application UUIDs in C<~/Container> directories and generate display IDs which can be used to create L<alias> for directory path. Additionaly, env C<$VARIABLE> is created to use in scripts and C<$variable> display id of application to use with other tools such as activator, open etc.
 
 =back
 
