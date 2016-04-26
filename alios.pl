@@ -93,6 +93,15 @@ sub del {
     close $fh;
 }
 
+sub write {
+    my $filter = shift;
+    # write old+new values into $alios_json
+            open(my $fh,">",$alios_json) || "cant open $alios_json:$!";
+            print $fh encode_json \@filter;
+            close $fh;
+            return \@filter
+}
+
 # --searchmap appids
 my $searchmap = sub {
     my $filter = shift;
@@ -104,10 +113,16 @@ my $searchmap = sub {
     my $j = <$fh>;
     @filter = @{ decode_json $j };
     close $fh;
+    
+    # delete entry from $alios_json
+    if(defined $option->{d}){
+        my @d = grep { $_->{name} eq $filter } @$p;
+        for(@d){ undef $_ }
+    }
 
     if( defined $option->{m} and defined $option->{n}){
-        my @f = grep { $_->{apnr} eq $filter } @{deserialize()};
-        for(@f){
+     my @f = grep { $_->{apnr} eq $filter } @{deserialize()};
+     for(@f){
             if(defined $option->{n}){
                 $_->{name} = $name;
             } else {
@@ -124,12 +139,7 @@ my $searchmap = sub {
             print $fh $_->{name} . '=' . $_->{apid} . "\n";
             close $fh;
             }
-
-            # write old+new values into $alios_json
-            open(my $fh,">",$alios_json) || "cant open $alios_json:$!";
-            print $fh encode_json \@filter;
-            close $fh;
-            return \@filter;
+            write(\@filterr)
     } else {
         # trigered w/ -s option, list apid/apnr tree
         $filter = lc qr/$filter/;
