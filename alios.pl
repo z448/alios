@@ -86,15 +86,20 @@ sub deserialize {
     return \@$p;
 }
 
+=cut
+
 sub del {
-    open(my $xfh, "<:encoding(UTF-8)", $alios_json);
-    my $j = decode_json <$xfh>;
+    open(my $fh, "<:encoding(UTF-8)", $alios_json);
+    my $j = decode_json <$fh>;
     for(@$j){
         say colored(['white on_red'], $_->{apid});
     }
-    close $xfh;
+    close $fh;
 }
 del();
+
+=cut
+
 
 
 #say colored(['yellow'],'deserialized') if deserialize();
