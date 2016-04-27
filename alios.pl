@@ -14,7 +14,7 @@ use JSON qw< encode_json decode_json>;
 use open qw< :encoding(UTF-8) >;
 
 my $option = {};
-getopts('sm:d:n:f:pi', $option);
+getopts('rhsm:d:n:f:pi', $option);
 my $apnr = 0;
 my ( $alios_json, $alios, $dfhr, $app, @app, @base, $store, $cache ) = ();
 
@@ -84,30 +84,42 @@ sub deserialize {
     return \@$p;
 }
 
+# --write old+new values into $alios_json
 my $write_alios = sub {
     my $write = shift;
-     
-    # write old+new values into $alios_json
     open(my $fh,">",$alios_json) || "cant open $alios_json:$!";
     print $fh encode_json $write;
     close $fh;
 };
 
+my $reset = sub {
+    my $files = shift;
+    open(my $fh,">",$alios_json) || die "cant open $alios_json";
+    print $fh '[{}]';
+};
+    
 # --searchmap appids
 my $searchmap = sub {
     my ($filter, $name) = @_;
-    my (@filter, @alios) = ();
+    my (@filter, @alios, $fh) = ();
 
-    # read stored values; todo: delete from stored values
-    open(my $fh,"<",$alios_json) || die "cant open $alios_json:$!";
-    my $j = <$fh>;
-    @filter = @{ decode_json $j };
+    # read stored values;
+    if( -f $alios_json ){
+        open($fh,"<",$alios_json) || die "cant open $alios_json: $!";
+        say 'opened ~/.alios.json - ok';
+    } else {
+        say 'opened ~/.alios.json - NOTOK';
+        $reset->($alios_json);
+    }
+    #my $j = <$fh>;
+    #@filter = @{ decode_json $j };
+    @filter = @{ decode_json <$fh> };
     close $fh;
     
     # delete entry from $alios_json
     if(defined $option->{d}){
         @alios = grep { $_->{name} ne $filter } @filter;
-        say $write_alios->(\@alios);
+        $write_alios->(\@alios);
     } 
     elsif( defined $option->{m} and defined $option->{n}){
         my @f = grep { $_->{apnr} eq $filter } @{deserialize()};
@@ -122,12 +134,12 @@ my $searchmap = sub {
                 @filter = (@filter, @f);
 
                 # write to shell env $alios
-                open(my $fh, ">>", $alios) || "cant open $alios:$!";
+                open($fh, ">>", $alios) || "cant open $alios:$!";
                 print $fh uc($_->{name}). '=' . $_->{path} . ';';
                 print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
                 print $fh $_->{name} . '=' . $_->{apid} . "\n";
                 close $fh;
-                say $write_alios->(\@filter);
+                $write_alios->(\@filter);
         }
     } else {
         # trigered w/ -s option, list apid/apnr tree
@@ -149,27 +161,27 @@ my $list = sub {
     
 
 if(defined $option->{i}){
-    $init->(); serialize() and say "init; serialize"; 
-    say Dumper(deserialize());
-} elsif(defined $option->{f}){
+    $init->(); serialize() and say Dumper(deserialize());
+} elsif( defined $option->{f} ){
     print Dumper($searchmap->($option->{f}));
-} elsif(defined $option->{p}){
+} elsif( defined $option->{p} ){
     $check->();
-} elsif(defined $option->{m}){
+} elsif( defined $option->{m} ){
     say Dumper($searchmap->($option->{m}, $option->{n}));
 } elsif(defined $option->{d}){
     say Dumper($searchmap->($option->{d}));
-} else {
-    $list->();
-}
-        
+} elsif(defined $option->{r}){
+    $reset->($alios_json);
+} elsif ( defined $option->{h} ){
+    system("perldoc $0");
+} else { $list->() }
 
 
 __DATA__
 
 =head1 NAME
 
-=over 16
+=over 10
 
 =item alios - creates aliases/variables for iOS UUID folders 
 
@@ -177,15 +189,17 @@ back
 
 =head1 SYNOPSIS
 
-=over 16
+=over 10
 
-force init
+=item initialize
 
-=item C<alios -i>
+C<alios -i>
 
--source from ~/.bashrc or ~/.bash_profile
+=item bashrc
 
-=item C<alios -p && source ~/.alios>
+C<source from ~/.bashrc or ~/.bash_profile>
+
+C<alios -p && source ~/.alios>
 
 -search app
 =item C<alios [-f] [keyword]>
@@ -197,9 +211,9 @@ force init
 
 =head1 DESCRIPTION
 
-=over 16
+=over 10
 
-=item Loops over application UUIDs in C<~/Container> directories and generate display IDs which can be used to create L<alias> for directory path. Additionaly, env C<$VARIABLE> is created to use in scripts and C<$variable> display id of application to use with other tools such as activator, open etc.
+Loops over application UUIDs in C<~/Container> directories and generate display IDs which can be used to create L<alias> for directory path. Additionaly, env C<$VARIABLE> is created to use in scripts and C<$variable> display id of application to use with other tools such as activator, open etc.
 
 =back
 
