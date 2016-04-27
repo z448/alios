@@ -84,15 +84,6 @@ sub deserialize {
     return \@$p;
 }
 
-sub del {
-    open(my $fh, "<", $alios_json) || die "cant open $alios_json: $!";
-    my $j = decode_json <$fh>;
-    for(@$j){
-        say colored(['white on_red'], $_->{apid});
-    }
-    close $fh;
-}
-
 my $write_alios = sub {
     my $write = shift;
      
@@ -104,8 +95,7 @@ my $write_alios = sub {
 
 # --searchmap appids
 my $searchmap = sub {
-    my $filter = shift;
-    my $name = shift;
+    my ($filter, $name) = @_;
     my (@filter, @alios) = ();
 
     # read stored values; todo: delete from stored values
