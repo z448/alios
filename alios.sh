@@ -9,8 +9,8 @@ conf2="$HOME/.alios"
 groupid="group"
 me=alios
 
-paths=( /var/mobile/Containers/Data/Application/*/Library/Preferences\
-        /var/mobile/Containers/Shared/AppGroup/*/Library/Preferences    )
+paths=( $HOME/Containers/Data/Application/*/Library/Preferences\
+        $HOME/Containers/Shared/AppGroup/*/Library/Preferences    )
 
 function check_plist {
     echo '' > $cache
