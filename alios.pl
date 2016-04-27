@@ -151,12 +151,12 @@ my $searchmap = sub {
 };      
 
 my $list = sub {
-        my @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
-        for(@filter){
-            my $ln = length $_->{apid};
-            my $tail = $_->{apid}; $tail =~ s/(.*\.)(.*)/$2/;
-            say " " x $ln . "$tail" . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{apnr}"); 
-        }
+    my @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
+    for(@filter){
+        my $ln = length $_->{apid};
+        my $tail = $_->{apid}; $tail =~ s/(.*\.)(.*)/$2/;
+        say " " x $ln . "$tail" . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{apnr}"); 
+    }
 };
     
 
@@ -174,7 +174,12 @@ if(defined $option->{i}){
     $reset->($alios_json);
 } elsif ( defined $option->{h} ){
     system("perldoc $0");
-} else { $list->() }
+} elsif ( defined $option->{s} ){
+    $list->();
+}
+
+    
+
 
 
 __DATA__
