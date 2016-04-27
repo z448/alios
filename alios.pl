@@ -138,7 +138,7 @@ my $searchmap = sub {
     }
 };      
 
-my $search = sub {
+my $list = sub {
         my @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
         for(@filter){
             my $ln = length $_->{apid};
@@ -148,7 +148,6 @@ my $search = sub {
 };
     
 
-say colored(['black on_yellow'], "  option:");#----------------debug
 if(defined $option->{i}){
     $init->(); serialize() and say "init; serialize"; 
     say Dumper(deserialize());
@@ -158,11 +157,12 @@ if(defined $option->{i}){
     $check->();
 } elsif(defined $option->{m}){
     say Dumper($searchmap->($option->{m}, $option->{n}));
-} elsif(defined $option->{s}){
-    say Dumper($search->());
 } elsif(defined $option->{d}){
     say Dumper($searchmap->($option->{d}));
+} else {
+    $list->();
 }
+        
 
 
 __DATA__
