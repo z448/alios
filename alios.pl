@@ -230,7 +230,7 @@ C<alios -p && source ~/.alios>
 
 C<alios -m nr -n name>
 
-=item delete alias
+=item delete saved alias
 
 C<alios -d name>
 
@@ -243,6 +243,14 @@ C<alios>
 =item search app
 
 C<alios -f keyword>
+
+=item reset ( clear all entrys in ~/.alios config )
+
+C<alios -r>
+
+=item perldoc/help
+
+C<alios -h>
 
 =back
 
