@@ -16,7 +16,7 @@ use open qw< :encoding(UTF-8) >;
 my $option = {};
 getopts('rhsm:d:n:f:pi', $option);
 my $apnr = 0;
-my ( $alios_json, $alios, $dfhr, $app, @app, @base, $store, $cache ) = ();
+my ( $alios_json, $alios, $app, @app, @base, $cache ) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
