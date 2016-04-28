@@ -42,14 +42,25 @@ my $init = sub {
     },  @base );
 };
 
-my $repath = sub {
-    my $broken = shift;
-    say colored(['black on_yellow'], " repath:"); #---------------debug
-    say "broken links:";
-    for(@$broken){
-        print colored(['black on_red'], "\t" . $_->{apid});
-    }
-    $init->(), serialize(); deserialize();
+my $reset = sub {
+    my $init_json = '[{}]';
+    open(my $fh,">",$alios_json) || die "cant open $alios_json";
+    print $fh $init_json;
+    close $fh;
+    return $init_json
+};
+
+my $stored = sub {
+    my @filter = ('[{}]');
+# read stored values;
+    if( ! -f $alios_json ){
+        @filter = @{ decode_json $reset->() };
+    } else {
+        open(my $fh,"<",$alios_json) || die "cant open $alios_json: $!";
+        @filter = @{ decode_json <$fh> };
+        close $fh;
+    } 
+    return \@filter;
 };
 
 my $list = sub {
@@ -72,69 +83,12 @@ my $list = sub {
     }
 };
 
-my $check = sub {
-    say colored(['black on_yellow'], " check:"); #----------------debug
-    my @broken = ();
-    for( @app ){
-        if( ! -f $_->{plist}){
-            say colored(['yellow'], $_->{apid});
-            push @broken, $_;
-        }
-    }
-    if (@broken){
-        $repath->(\@broken) 
-    } else { 
-        say "no broken links" and return;
-    }
-    $list->('alios');
-};  
 
-
-sub serialize {
-# --json write
-    say colored(['black on_yellow'], " serialize:") . "json"; #---------------debug
-    open(my $jfh,">",$cache) || die "cant open $cache: $!";
-    my $j = encode_json \@app;
-    print $jfh $j;
-}
-
-# --json read
-sub deserialize {
-    open(my $jfh,"<",$cache) || die "cant open $cache: $!";
-    local $\ = undef;
-    my $j = <$jfh>;
-    my $p = decode_json $j;
-    return \@$p;
-}
-
-# --write old+new values into $alios_json
 my $write_alios = sub {
     my $write = shift;
     open(my $fh,">",$alios_json) || die "cant open $alios_json:$!";
     print $fh encode_json $write;
     close $fh;
-};
-
-my $reset = sub {
-    my $init_json = '[{}]';
-    open(my $fh,">",$alios_json) || die "cant open $alios_json";
-    print $fh $init_json;
-    close $fh;
-    return $init_json
-};
-
-
-my $stored = sub {
-    my @filter = ('[{}]');
-# read stored values;
-    if( ! -f $alios_json ){
-        @filter = @{ decode_json $reset->() };
-    } else {
-        open(my $fh,"<",$alios_json) || die "cant open $alios_json: $!";
-        @filter = @{ decode_json <$fh> };
-        close $fh;
-    } 
-    return \@filter;
 };
 
 # --searchmap appids
@@ -168,6 +122,7 @@ my $searchmap = sub {
                 print $fh $_->{name} . '=' . $_->{apid} . "\n";
                 close $fh;
                 $write_alios->(\@filter);
+                $list->('alios');
         }
     } else {
         # trigered w/ -s option, list apid/apnr tree
@@ -178,6 +133,50 @@ my $searchmap = sub {
     }
 };      
 
+my $repath = sub {
+    my $broken = shift;
+    say colored(['black on_yellow'], " repath:"); #---------------debug
+    say "broken links:";
+    for(@$broken){
+        print colored(['black on_red'], "\t" . $_->{apid});
+        $init->();
+        $searchmap->($_->{apnr}, $_->{name});
+    }
+};
+
+my $check = sub {
+    say colored(['black on_yellow'], " check:"); #----------------debug
+    my @broken = ();
+    for(@{$stored->('alios')}){
+        if( ! -d $_->{path}){
+            say colored(['yellow'], $_->{apid});
+            push @broken, $_;
+        }
+    }
+    $repath->(\@broken);
+    $list->('alios');
+};  
+
+
+sub serialize {
+# --json write
+    say colored(['black on_yellow'], " serialize:") . "json"; #---------------debug
+    open(my $jfh,">",$cache) || die "cant open $cache: $!";
+    my $j = encode_json \@app;
+    print $jfh $j;
+}
+
+# --json read
+sub deserialize {
+    open(my $jfh,"<",$cache) || die "cant open $cache: $!";
+    local $\ = undef;
+    my $j = <$jfh>;
+    my $p = decode_json $j;
+    return \@$p;
+}
+
+# --write old+new values into $alios_json
+
     
 
 if(defined $option->{i}){
@@ -187,7 +186,7 @@ if(defined $option->{i}){
 } elsif( defined $option->{p} ){
     $check->();
 } elsif( defined $option->{m} ){
-    say Dumper($searchmap->($option->{m}, $option->{n}));
+    $searchmap->($option->{m}, $option->{n});
 } elsif(defined $option->{d}){
     say Dumper($searchmap->($option->{d}));
 } elsif(defined $option->{r}){
