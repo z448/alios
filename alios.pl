@@ -52,6 +52,26 @@ my $repath = sub {
     $init->(), serialize(); deserialize();
 };
 
+my $list = sub {
+    my $mode = shift || 'all';
+    my @filter = ();
+
+    if($mode eq 'alios'){
+        print colored(['black on_yellow']," alios ");
+        for(@{$stored->()}){
+            print ' ' . $_->{name};
+        }
+        print ' ' . colored(['black on_yellow'], " ") . "\n";
+    } elsif($mode eq 'all') {
+        @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
+    }
+    for(@filter){
+        my $ln = length $_->{apid};
+        my $tail = $_->{apid}; $tail =~ s/(.*\.)(.*)/$2/;
+        say " " x $ln . "$tail" . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{apnr}"); 
+    }
+};
+
 my $check = sub {
     say colored(['black on_yellow'], " check:"); #----------------debug
     my @broken = ();
@@ -63,7 +83,10 @@ my $check = sub {
     }
     if (@broken){
         $repath->(\@broken) 
-    } else { say "no broken links" and return; }
+    } else { 
+        say "no broken links" and return;
+    }
+    $list->('alios');
 };  
 
 
@@ -112,26 +135,6 @@ my $stored = sub {
         close $fh;
     } 
     return \@filter;
-};
-
-my $list = sub {
-    my $mode = shift || 'all';
-    my @filter = ();
-
-    if($mode eq 'alios'){
-        print colored(['black on_yellow']," alios ");
-        for(@{$stored->()}){
-            print ' ' . $_->{name};
-        }
-        print ' ' . colored(['black on_yellow'], " ") . "\n";
-    } elsif($mode eq 'all') {
-        @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
-    }
-    for(@filter){
-        my $ln = length $_->{apid};
-        my $tail = $_->{apid}; $tail =~ s/(.*\.)(.*)/$2/;
-        say " " x $ln . "$tail" . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{apnr}"); 
-    }
 };
 
 # --searchmap appids
@@ -219,17 +222,15 @@ back
 
 C<alios -i>
 
-=item bashrc
-
-C<source from ~/.bashrc or ~/.bash_profile>
+=item C<source from ~/.bashrc or ~/.bash_profile>
 
 C<alios -p && source ~/.alios>
 
 -search app
-=item C<alios [-f] [keyword]>
+=item C<alios -f keyword>
 
--map alias and $variable
-=item C<alios [-m] nr [-n] appname>
+-map alias
+=item C<alios -m nr -n name>
 
 =back
 
@@ -237,7 +238,9 @@ C<alios -p && source ~/.alios>
 
 =over 10
 
-Loops over application UUIDs in C<~/Container> directories and generate display IDs which can be used to create L<alias> for directory path. Additionaly, env C<$VARIABLE> is created to use in scripts and C<$variable> display id of application to use with other tools such as activator, open etc.
+Searches for display IDs in C<~/Container> directories to create L<alias> for application directory path. 
+
+Path is assigned to L<$VARIABLE> to use in script, display ID is assigned to L<$variable> to use with other tools such as activator, open etc.
 
 =back
 
