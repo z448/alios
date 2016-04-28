@@ -87,33 +87,51 @@ sub deserialize {
 # --write old+new values into $alios_json
 my $write_alios = sub {
     my $write = shift;
-    open(my $fh,">",$alios_json) || "cant open $alios_json:$!";
+    open(my $fh,">",$alios_json) || die "cant open $alios_json:$!";
     print $fh encode_json $write;
     close $fh;
 };
 
 my $reset = sub {
-    my $files = shift;
+    my $init_json = '[{}]';
     open(my $fh,">",$alios_json) || die "cant open $alios_json";
-    print $fh '[{}]';
+    print $fh $init_json;
+    close $fh;
+    return $init_json
 };
 
 
 my $stored = sub {
-    my $fh = undef;
+    my @filter = ('[{}]');
 # read stored values;
-    if( -f $alios_json ){
-        open($fh,"<",$alios_json) || die "cant open $alios_json: $!";
-        say 'opened ~/.alios.json - ok';
+    if( ! -f $alios_json ){
+        @filter = @{ decode_json $reset->() };
     } else {
-        say 'opened ~/.alios.json - NOTOK';
-        $reset->($alios_json);
-    }
-#my $j = <$fh>;
-#@filter = @{ decode_json $j };
-    my @filter = @{ decode_json <$fh> };
-    close $fh;
+        open(my $fh,"<",$alios_json) || die "cant open $alios_json: $!";
+        @filter = @{ decode_json <$fh> };
+        close $fh;
+    } 
     return \@filter;
+};
+
+my $list = sub {
+    my $mode = shift || 'all';
+    my @filter = ();
+
+    if($mode eq 'alios'){
+        print colored(['black on_yellow']," alios ");
+        for(@{$stored->()}){
+            print ' ' . $_->{name};
+        }
+        print ' ' . colored(['black on_yellow'], " ") . "\n";
+    } elsif($mode eq 'all') {
+        @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
+    }
+    for(@filter){
+        my $ln = length $_->{apid};
+        my $tail = $_->{apid}; $tail =~ s/(.*\.)(.*)/$2/;
+        say " " x $ln . "$tail" . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{apnr}"); 
+    }
 };
 
 # --searchmap appids
@@ -126,6 +144,7 @@ my $searchmap = sub {
     if(defined $option->{d}){
         @alios = grep { $_->{name} ne $filter } @filter;
         $write_alios->(\@alios);
+        $list->('alios');
     } 
     elsif( defined $option->{m} and defined $option->{n}){
         my @f = grep { $_->{apnr} eq $filter } @{deserialize()};
@@ -140,7 +159,7 @@ my $searchmap = sub {
                 @filter = (@filter, @f);
 
                 # write to shell env $alios
-                open($fh, ">>", $alios) || "cant open $alios:$!";
+                open($fh, ">>", $alios) || die "cant open $alios:$!";
                 print $fh uc($_->{name}). '=' . $_->{path} . ';';
                 print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
                 print $fh $_->{name} . '=' . $_->{apid} . "\n";
@@ -156,21 +175,6 @@ my $searchmap = sub {
     }
 };      
 
-my $list = sub {
-    my $mode = shift || '';
-    my @filter = ();
-
-    if($mode eq 'alios'){
-        @filter = grep { $_->{apnr} =~ /.*/ } @{$stored->()};
-    } else {
-        @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
-    }
-    for(@filter){
-        my $ln = length $_->{apid};
-        my $tail = $_->{apid}; $tail =~ s/(.*\.)(.*)/$2/;
-        say " " x $ln . "$tail" . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{apnr}"); 
-    }
-};
     
 
 if(defined $option->{i}){
@@ -184,10 +188,10 @@ if(defined $option->{i}){
 } elsif(defined $option->{d}){
     say Dumper($searchmap->($option->{d}));
 } elsif(defined $option->{r}){
-    $reset->($alios_json);
-} elsif ( defined $option->{h} ){
+    reset->();
+} elsif (defined $option->{h}){
     system("perldoc $0");
-} elsif ( defined $option->{s} ){
+} elsif (defined $option->{s}){
     $list->();
 } else {
     $list->('alios');
