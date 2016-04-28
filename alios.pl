@@ -97,13 +97,11 @@ my $reset = sub {
     open(my $fh,">",$alios_json) || die "cant open $alios_json";
     print $fh '[{}]';
 };
-    
-# --searchmap appids
-my $searchmap = sub {
-    my ($filter, $name) = @_;
-    my (@filter, @alios, $fh) = ();
 
-    # read stored values;
+
+my $stored = sub {
+    my $fh = undef;
+# read stored values;
     if( -f $alios_json ){
         open($fh,"<",$alios_json) || die "cant open $alios_json: $!";
         say 'opened ~/.alios.json - ok';
@@ -111,11 +109,19 @@ my $searchmap = sub {
         say 'opened ~/.alios.json - NOTOK';
         $reset->($alios_json);
     }
-    #my $j = <$fh>;
-    #@filter = @{ decode_json $j };
-    @filter = @{ decode_json <$fh> };
+#my $j = <$fh>;
+#@filter = @{ decode_json $j };
+    my @filter = @{ decode_json <$fh> };
     close $fh;
-    
+    return \@filter;
+};
+
+# --searchmap appids
+my $searchmap = sub {
+    my ($filter, $name) = @_;
+    my (@filter, @alios, $fh) = ();
+
+    @filter = @{$stored->()};
     # delete entry from $alios_json
     if(defined $option->{d}){
         @alios = grep { $_->{name} ne $filter } @filter;
@@ -145,13 +151,20 @@ my $searchmap = sub {
         # trigered w/ -s option, list apid/apnr tree
         $filter = lc qr/$filter/;
         @filter = grep { lc $_->{apid} =~ /$filter/ } @{deserialize()};
-        print Dumper(\@filter) and die;
+        print Dumper(\@filter);# and die;
         return \@filter;
     }
 };      
 
 my $list = sub {
-    my @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
+    my $mode = shift || '';
+    my @filter = ();
+
+    if($mode eq 'alios'){
+        @filter = grep { $_->{apnr} =~ /.*/ } @{$stored->()};
+    } else {
+        @filter = grep { $_->{apnr} =~ /.*/ } @{deserialize()};
+    }
     for(@filter){
         my $ln = length $_->{apid};
         my $tail = $_->{apid}; $tail =~ s/(.*\.)(.*)/$2/;
@@ -176,6 +189,8 @@ if(defined $option->{i}){
     system("perldoc $0");
 } elsif ( defined $option->{s} ){
     $list->();
+} else {
+    $list->('alios');
 }
 
     
