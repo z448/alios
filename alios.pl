@@ -226,11 +226,23 @@ C<alios -i>
 
 C<alios -p && source ~/.alios>
 
--search app
-=item C<alios -f keyword>
+=item map alias
 
--map alias
-=item C<alios -m nr -n name>
+C<alios -m nr -n name>
+
+=item delete alias
+
+C<alios -d name>
+
+=item list saved aliases
+
+C<alios>
+
+=item list all display IDs in ~/Container directory
+
+=item search app
+
+C<alios -f keyword>
 
 =back
 
