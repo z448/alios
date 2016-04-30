@@ -48,7 +48,7 @@ my $reset = sub {
     print $fh $init_alios_json;
     close $fh;
     ######open???
-    return \$init_alios_json;
+    return $init_alios_json;
 };
 
 my $stored = sub {
