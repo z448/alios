@@ -1,1 +1,1 @@
-require 'UUID::Tiny', '1.04';
+requires 'UUID::Tiny', '1.04';
