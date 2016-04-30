@@ -4,10 +4,16 @@ use 5.010;
 use Encode;
 use File::Path qw< make_path remove_tree >;
 use Data::Dumper;
+use UUID::Tiny qw<:std>;
 
 my $switch = $ARGV[0] || 'create';
 my $contain = "Containers";
-my @containers = ("Containers/Data/Application/FC3256EE-C34F-FC21-AS45-FC3256EE/Library/Preferences", "Containers/Shared/AppGroup/F34F5232-C34F-FC21-AS45-FC3256EE/Library/Preferences");
+my $uuid  = sub { return uc create_uuid_as_string(UUID_V1) };
+
+my $uuid1 = $uuid->();
+my $uuid2 = $uuid->();
+
+my @containers = (qq|Containers/Data/Application/$uuid1/Library/Preferences|, qq|Containers/Shared/AppGroup/$uuid2/Library/Preferences|);
 my $plist = "test.alios.plist";
 
 if($switch eq '-d'){
