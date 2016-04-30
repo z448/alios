@@ -43,21 +43,22 @@ my $init = sub {
 };
 
 my $reset = sub {
-    my $init_json = '[{}]';
+    my $init_alios_json = '[{}]';
     open(my $fh,">",$alios_json) || die "cant open $alios_json";
-    print $fh $init_json;
+    print $fh $init_alios_json;
     close $fh;
-    return $init_json
+    ######open???
+    return \$init_alios_json
 };
 
 my $stored = sub {
-    my @filter = ('[{}]');
+    my $filter = shift;
 # read stored values;
     if( ! -f $alios_json ){
-        @filter = @{ decode_json $reset->() };
+        @$filter = @{ decode_json $reset->() };
     } else {
         open(my $fh,"<",$alios_json) || die "cant open $alios_json: $!";
-        @filter = @{ decode_json <$fh> };
+        @$filter = @{ decode_json <$fh> };
         close $fh;
     } 
     return \@filter;
