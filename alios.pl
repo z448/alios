@@ -4,6 +4,7 @@ use 5.010;
 use warnings;
 use strict;
 
+use Term::Pulse;
 use File::Find;
 use Term::ANSIColor;
 use Encode;
