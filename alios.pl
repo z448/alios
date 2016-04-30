@@ -43,22 +43,23 @@ my $init = sub {
 };
 
 my $reset = sub {
-    my $init_alios_json = '[{}]';
+    my $init_alios_json = '[{"name":"test"}]';
     open(my $fh,">",$alios_json) || die "cant open $alios_json";
     print $fh $init_alios_json;
     close $fh;
     ######open???
-    return \$init_alios_json
+    return \$init_alios_json;
 };
 
 my $stored = sub {
     my $filter = shift;
+    my @filter = ();
 # read stored values;
     if( ! -f $alios_json ){
-        @$filter = @{ decode_json $reset->() };
+        @filter = @{ decode_json $reset->() };
     } else {
         open(my $fh,"<",$alios_json) || die "cant open $alios_json: $!";
-        @$filter = @{ decode_json <$fh> };
+        @filter = @{ decode_json <$fh> };
         close $fh;
     } 
     return \@filter;
@@ -191,7 +192,9 @@ if(defined $option->{i}){
 } elsif(defined $option->{d}){
     say Dumper($searchmap->($option->{d}));
 } elsif(defined $option->{r}){
-    reset->();
+    my $jtest = $reset->();
+    my $ptest = decode_json $jtest;
+    print Dumper($ptest);
 } elsif (defined $option->{h}){
     system("perldoc $0");
 } elsif (defined $option->{s}){
