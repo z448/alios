@@ -22,7 +22,7 @@ my ( $alios_json, $alios, $app, @app, @base, $cache ) = ();
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 $cache = "$ENV{HOME}/.alios.cache.json";
 $alios = "$ENV{HOME}/.alios";
-$alios_json = "$ENV{HOME}/.alios.json";
+$alios_json = "./.alios.json";
 
 my $init = sub {
     say colored(['black on_yellow'], " init:"); #----------------debug
