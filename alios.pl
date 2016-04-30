@@ -183,7 +183,7 @@ sub deserialize {
     
 
 if(defined $option->{i}){
-    pulse_start( name => 'Initializing ', rotate => 0, time => 1 );
+    pulse_start( name => 'Initializing ', rotate => 1, time => 1, size => 20 );
     $init->();
     pulse_stop();
     serialize() and say Dumper(deserialize());   
