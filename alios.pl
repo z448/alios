@@ -184,9 +184,9 @@ sub deserialize {
 
 if(defined $option->{i}){
     pulse_start( name => 'Initializing ', rotate => 1, time => 1, size => 20 );
-    $init->();
+    $init->(); serialize() and say Dumper(deserialize());
     pulse_stop();
-    serialize() and say Dumper(deserialize());   
+       
 } elsif( defined $option->{f} ){
     print Dumper($searchmap->($option->{f}));
 } elsif( defined $option->{p} ){
