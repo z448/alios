@@ -6,7 +6,7 @@ use File::Path qw< make_path remove_tree >;
 use Data::Dumper;
 
 my $switch = $ARGV[0] || 'create';
-my $contain = "Container";
+my $contain = "Containers";
 my @containers = ("Containers/Data/Application/FC3256EE-C34F-FC21-AS45-FC3256EE/Library/Preferences", "Containers/Shared/AppGroup/F34F5232-C34F-FC21-AS45-FC3256EE/Library/Preferences");
 my $plist = "test.alios.plist";
 
