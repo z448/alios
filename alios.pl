@@ -4,7 +4,7 @@ use 5.010;
 use warnings;
 use strict;
 
-use Term::Pulse;
+#use Term::Pulse;
 use File::Find;
 use Term::ANSIColor;
 use Encode;
@@ -50,7 +50,7 @@ my $reset = sub {
     close $fh;
     ######open???
     return $init_alios_json;
-;
+};
 
 my $stored = sub {
     my $filter = shift;
@@ -133,7 +133,7 @@ my $searchmap = sub {
         # trigered w/ -s option, list apid/apnr tree
         $filter = lc qr/$filter/;
         @filter = grep { lc $_->{apid} =~ /$filter/ } @{deserialize()};
-        print Dumper(\@filter);# and die;
+        #print Dumper(\@filter);# and die;
         return \@filter;
     }
 };      
@@ -141,13 +141,12 @@ my $searchmap = sub {
 my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], " repath:"); #---------------debug
-    $init->() and say 'initialized.';
+    $init->() and say 'initialized';
     say "broken links:";
     for(@$broken){
         print $_->{apid} . ' ';
         $searchmap->($_->{apnr}, $_->{name});
     }
-    system("cat ~/.alios") and die;
 };
 
 my $check = sub {
@@ -186,13 +185,12 @@ sub deserialize {
     
 
 if(defined $option->{i}){
-    pulse_start( name => 'Initializing ', rotate => 1, time => 1, size => 20 );
-    $init->(); serialize() and say Dumper(deserialize());
-    pulse_stop();
-       
+    $init->() and die;
+    serialize() and say Dumper(deserialize());
+
 } elsif( defined $option->{f} ){
     print Dumper($searchmap->($option->{f}));
-} elsif( defined $option->{p} ){
+} elsif(defined $option->{p}){
     $check->();
 } elsif( defined $option->{m} ){
     $searchmap->($option->{m}, $option->{n});
@@ -209,12 +207,6 @@ if(defined $option->{i}){
 } else {
     $list->('alios');
 }
-
-    
-
-
-
-__DATA__
 
 =head1 NAME
 
