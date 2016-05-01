@@ -21,8 +21,8 @@ my ( $alios_json, $alios, $app, @app, @base, $cache ) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
-$cache = "$ENV{HOME}/.alios.cache.json";
-$alios = "$ENV{HOME}/.alios";
+$cache = "./.alios.cache.json";
+$alios = "./.alios";
 $alios_json = "./.alios.json";
 
 my $init = sub {
@@ -50,7 +50,7 @@ my $reset = sub {
     close $fh;
     ######open???
     return $init_alios_json;
-};
+;
 
 my $stored = sub {
     my $filter = shift;
@@ -88,10 +88,20 @@ my $list = sub {
 
 
 my $write_alios = sub {
-    my $write = shift;
+    my $filter= shift;
     open(my $fh,">",$alios_json) || die "cant open $alios_json:$!";
-    print $fh encode_json $write;
+    print $fh encode_json $filter;
     close $fh;
+
+    # write to shell env $alios
+    for(@$filter){
+        open($fh, ">>", $alios) || die "cant open $alios:$!";
+        print $fh uc($_->{name}). '=' . $_->{path} . ';';
+        print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
+        print $fh $_->{name} . '=' . $_->{apid} . "\n";
+        close $fh;
+    }
+    $list->('alios');
 };
 
 # --searchmap appids
@@ -117,15 +127,7 @@ my $searchmap = sub {
                 }
                 # concatenate stored $alios_json w/ new map
                 @filter = (@filter, @f);
-
-                # write to shell env $alios
-                open($fh, ">>", $alios) || die "cant open $alios:$!";
-                print $fh uc($_->{name}). '=' . $_->{path} . ';';
-                print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
-                print $fh $_->{name} . '=' . $_->{apid} . "\n";
-                close $fh;
                 $write_alios->(\@filter);
-                $list->('alios');
         }
     } else {
         # trigered w/ -s option, list apid/apnr tree
@@ -139,12 +141,13 @@ my $searchmap = sub {
 my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], " repath:"); #---------------debug
+    $init->() and say 'initialized.';
     say "broken links:";
     for(@$broken){
-        print colored(['black on_red'], "\t" . $_->{apid});
-        $init->();
+        print $_->{apid} . ' ';
         $searchmap->($_->{apnr}, $_->{name});
     }
+    system("cat ~/.alios") and die;
 };
 
 my $check = sub {
