@@ -31,6 +31,11 @@ ApplePushService     BatteryLife    CallHistoryTransactions  CrashReporter      
 Application Support  BulletinBoard  Carrier Bundles          Cydia                  GameKit       Keyboard           MobileBluetooth   OTALogging              Social       TCC                com.apple.Music  fps
 ```
 
+**use TextEdit dir in Mobile\ Documents as alios cloud storage**
+```bash
+mini:~/Library/Mobile Documents/com~apple~TextEdit/Documents mobile$
+```
+
 
 
 
