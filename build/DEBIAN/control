@@ -1,0 +1,10 @@
+Name: alios
+Package: net.z448.alios
+Section: Utilities
+Maintainer: Zdenek Bohunek (z448) <cydia@load.sh>
+Architecture: iphoneos-arm
+Version: 1.7
+Depends: bash, coreutils-bin
+Description: create and track aliases for app UUIDs
+Homepage: load.sh/cydia/www/alios
+
