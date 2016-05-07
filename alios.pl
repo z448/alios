@@ -178,6 +178,20 @@ sub deserialize {
     return \@$p;
 }
 
+my $repath2 = sub {
+    open(my $fh, "<",$alios_json);
+    my $j = <$fh>;
+    my $p = decode_json $j;
+    for(@$p){
+        unless(-f $_->{plist}){
+            $init->() and say "new path is $_->{plist}";
+        }
+    }
+};
+        
+    
+        
+        
 # --write old+new values into $alios_json
 
     
