@@ -33,7 +33,7 @@ my $init = sub {
             my $match = "$File::Find::dir/$_";
             $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
             $app{path} = $1 . $2 . $3;
-            $app{plist} = $6;
+            $app{plist} = $5 . $6;
             $app{plist_path} = $1 . $2 . $3 . $4 . $5 . $6;
             $app{apnr} = $apnr;
             $app{apid} = $5;
@@ -89,7 +89,7 @@ my $list = sub {
 
 
 my $write_alios = sub {
-    my $filter= shift;
+    my $filter = shift;
     open(my $fh,">",$alios_json) || die "cant open $alios_json:$!";
     print $fh encode_json $filter;
     close $fh;
@@ -140,35 +140,29 @@ my $searchmap = sub {
 };      
 
 my $repath = sub {
-    my $broken = shift;
-    say colored(['black on_yellow'], " repath:"); #---------------debug
-    serialize() and say 'initialized';     
-    my @repaired = grep{ my $broken_link = $_->{plist}; $broken_link = qr/$broken_link/; if( $$broken->{$_-{plist} =~ /$broken_link/) } @{deserialize();
-    say @repaired;
+    my $plist = shift;
+    serialize();     
+    #say $plist;
+    find( 
+        sub { if($_ eq $plist){ 
+                say "$File::Find::dir/$_" }
+        }, @base
+    )
+    #\@repaired;
 };
        
-    for(@$broken){
-        print "repath broken link: $_->{plist_path}";
-        $searchmap->($_->{apnr}, $_->{name});
-    }
-};
-
 my $check = sub {
-    say colored(['black on_yellow'], " check:"); #----------------debug
-    my @broken = ();
+    say "check: ";
     for(@{$stored->('alios')}){
-        if( ! -d $_->{path}){
-            say colored(['yellow'], $_->{apid});
-            push @broken, $_;
+        if( ! -f $_->{plist_path}){
+            $repath->($_->{plist}) and say "repath: broken link $_->{plist_path}";
         }
     }
-    $repath->(\@broken);
 };  
-
 
 sub serialize {
 # --json write
-    say colored(['black on_yellow'], " serialize:") . "json"; #---------------debug
+    say "serialize: ";
     open(my $jfh,">",$cache) || die "cant open $cache: $!";
     my $j = encode_json \@app;
     print $jfh $j;
