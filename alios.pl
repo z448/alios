@@ -141,7 +141,8 @@ my $searchmap = sub {
 my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], " repath:"); #---------------debug
-    $init->() and say 'initialized';
+    $init->() 
+    deserialize() and say 'initialized';
     say "broken links:";
     for(@$broken){
         print $_->{apid} . ' ';
@@ -181,7 +182,7 @@ sub deserialize {
 }
 
 # --write old+new values into $alios_json
-
+=head
 my $repath2 = sub {
     open(my $fh,"<",$alios_json);
     my $p = decode_json <$fh>;
@@ -192,6 +193,8 @@ my $repath2 = sub {
       }
     }
 };
+=cut
+
 
 if(defined $option->{i}){
     $init->() and die;
