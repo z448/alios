@@ -143,7 +143,7 @@ my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], " repath:"); #---------------debug
     $init->(); 
-    deserialize() and say 'initialized';
+    serialize() and say 'initialized';
     say "broken links:";
     for(@$broken){
         print "repath broken link: $_->{plist_path}" and die;
@@ -161,7 +161,6 @@ my $check = sub {
         }
     }
     $repath->(\@broken);
-    $list->('alios');
 };  
 
 
