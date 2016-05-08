@@ -143,8 +143,8 @@ my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], " repath:"); #---------------debug
     serialize() and say 'initialized';     
-    my @repath = grep{ $_ } @{deserialize();
-    say @repath;
+    my @repaired = grep{ my $broken_link = $_->{plist}; $broken_link = qr/$broken_link/; if( $$broken->{$_-{plist} =~ /$broken_link/) } @{deserialize();
+    say @repaired;
 };
        
     for(@$broken){
