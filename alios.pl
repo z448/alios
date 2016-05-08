@@ -33,7 +33,8 @@ my $init = sub {
             my $match = "$File::Find::dir/$_";
             $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
             $app{path} = $1 . $2 . $3;
-            $app{plist} = $1 . $2 . $3 . $4 . $5 . $6;
+            $app{plist} = $6;
+            $app{plist_path} = $1 . $2 . $3 . $4 . $5 . $6;
             $app{apnr} = $apnr;
             $app{apid} = $5;
             $app{uuid} = $3;
@@ -141,11 +142,11 @@ my $searchmap = sub {
 my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], " repath:"); #---------------debug
-    $init->();
+    $init->(); 
     deserialize() and say 'initialized';
     say "broken links:";
     for(@$broken){
-        print $_->{apid} . ' ';
+        print "repath broken link: $_->{plist_path}" and die;
         $searchmap->($_->{apnr}, $_->{name});
     }
 };
