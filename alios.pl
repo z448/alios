@@ -143,9 +143,11 @@ my $repath = sub {
     my $plist = shift;
     serialize();     
     #say $plist;
+    my @f = grep { 
     find( 
         sub { if($_ eq $plist){ 
-                say "$File::Find::dir/$_" }
+            
+            say "$File::Find::dir/$_" }
         }, @base
     )
     #\@repaired;
