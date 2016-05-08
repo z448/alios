@@ -143,19 +143,19 @@ my $repath = sub {
     my $broken = shift;
     serialize();     
     say $broken->{plist};
-    #say $broken->[0]->{plist};
+    my @filter = @{$stored->()};
     #@{deserialize()};
-=head1
+
     find( 
-        sub { if($_ eq $_->{plist}){ 
-                #say "$File::Find::dir/$_"; 
-            my @f = grep { $_->{plist} eq $_ } @filter;
-            say @f;
+        sub { if($_ eq $broken->{plist}){ 
+                $broken->{plist_path} = "$File::Find::dir/$_"; 
+            my @f = grep { $broken->{plist} eq $_ } @filter;
+            @filter = (@filter, @f);
+            $write_alios->(\@filter);
+            #say @f;
         }}, @base
     )
-    }
     #\@repaired;
-=cut
 };
        
 my $check = sub {
@@ -168,6 +168,7 @@ my $check = sub {
 };  
 
 sub serialize {
+    $init->();
 # --json write
     say "serialize: ";
     open(my $jfh,">",$cache) || die "cant open $cache: $!";
@@ -178,7 +179,6 @@ sub serialize {
 # --json read
 sub deserialize {
     open(my $jfh,"<",$cache) || die "cant open $cache: $!";
-    #local $\ = undef;
     my $j = <$jfh>;
     my $p = decode_json $j;
     return \@$p;
