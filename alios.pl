@@ -187,7 +187,8 @@ my $repath2 = sub {
     my $p = decode_json <$fh>;
     for(@$p){
       unless(-f $_->{plist}){
-        $init->();
+        find( sub{ my $plist =~ qr/$_->{plist}/;
+                    if($File::Find
       }
     }
 };
