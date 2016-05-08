@@ -146,7 +146,7 @@ my $repath = sub {
     serialize() and say 'initialized';
     say "broken links:";
     for(@$broken){
-        print "repath broken link: $_->{plist_path}" and die;
+        print "repath broken link: $_->{plist_path}";
         $searchmap->($_->{apnr}, $_->{name});
     }
 };
