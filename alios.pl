@@ -21,7 +21,7 @@ my ( $alios_json, $alios, $app, @app, @base, $cache ) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
-$cache = "./.alios.cache.json";
+$cache = ".alios.cache.json";
 $alios = "./.alios";
 $alios_json = "./.alios.json";
 
@@ -143,12 +143,13 @@ my $repath = sub {
     my $plist = shift;
     serialize();     
     #say $plist;
-    my @f = grep { 
+    my @filter = @{deserialize()};
     find( 
         sub { if($_ eq $plist){ 
-            
-            say "$File::Find::dir/$_" }
-        }, @base
+                #say "$File::Find::dir/$_"; 
+            my @f = grep { $_->{plist} eq $_ } @filter;
+            say @f;
+        }}, @base
     )
     #\@repaired;
 };
@@ -173,7 +174,7 @@ sub serialize {
 # --json read
 sub deserialize {
     open(my $jfh,"<",$cache) || die "cant open $cache: $!";
-    local $\ = undef;
+    #local $\ = undef;
     my $j = <$jfh>;
     my $p = decode_json $j;
     return \@$p;
