@@ -182,7 +182,15 @@ sub deserialize {
 
 # --write old+new values into $alios_json
 
-    
+my $repath2 = sub {
+    open(my $fh,"<",$alios_json);
+    my $p = decode_json <$fh>;
+    for(@$p){
+      unless(-f $_->{plist}){
+        $init->();
+      }
+    }
+};
 
 if(defined $option->{i}){
     $init->() and die;
