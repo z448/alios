@@ -141,7 +141,7 @@ my $searchmap = sub {
 my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], " repath:"); #---------------debug
-    $init->() 
+    $init->();
     deserialize() and say 'initialized';
     say "broken links:";
     for(@$broken){
