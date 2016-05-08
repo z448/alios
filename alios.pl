@@ -142,7 +142,7 @@ my $searchmap = sub {
 my $repath = sub {
     my $broken = shift;
     serialize();     
-    say $broken;
+    say $broken->{plist};
     #say $broken->[0]->{plist};
     #@{deserialize()};
 =head1
@@ -162,7 +162,7 @@ my $check = sub {
     say "check: ";
     for(@{$stored->('alios')}){
         if( ! -f $_->{plist_path}){
-            $repath->($_) and say "repath: broken link $_->{plist_path}";
+            say "repath: broken link $_->{plist_path}" and $repath->($_);
         }
     }
 };  
