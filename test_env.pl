@@ -17,8 +17,8 @@ my @containers = (qq|Containers/Data/Application/$uuid1/Library/Preferences|, qq
 my $plist = "test.alios.plist";
 
 if($switch eq '-d'){
-        remove_tree("$ENV{HOME}/$contain") or die "$!";
-        print "removed: $contain";
+    #remove_tree("$ENV{HOME}/$contain") or die "$!";
+       print "-d option is disabled; edit test_env.sh to enable it";
 } elsif($switch eq 'create'){
     for(@containers){
         make_path("$ENV{HOME}/$_");

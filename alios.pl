@@ -4,7 +4,7 @@ use 5.010;
 use warnings;
 use strict;
 
-use Term::Pulse;
+#use Term::Pulse;
 use File::Find;
 use Term::ANSIColor;
 use Encode;
@@ -21,8 +21,8 @@ my ( $alios_json, $alios, $app, @app, @base, $cache ) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
-$cache = "$ENV{HOME}/.alios.cache.json";
-$alios = "$ENV{HOME}/.alios";
+$cache = "./.alios.cache.json";
+$alios = "./.alios";
 $alios_json = "./.alios.json";
 
 my $init = sub {
@@ -33,7 +33,8 @@ my $init = sub {
             my $match = "$File::Find::dir/$_";
             $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
             $app{path} = $1 . $2 . $3;
-            $app{plist} = $1 . $2 . $3 . $4 . $5 . $6;
+            $app{plist} = $5 . $6;
+            $app{plist_path} = $1 . $2 . $3 . $4 . $5 . $6;
             $app{apnr} = $apnr;
             $app{apid} = $5;
             $app{uuid} = $3;
@@ -88,10 +89,20 @@ my $list = sub {
 
 
 my $write_alios = sub {
-    my $write = shift;
+    my $filter = shift;
     open(my $fh,">",$alios_json) || die "cant open $alios_json:$!";
-    print $fh encode_json $write;
+    print $fh encode_json $filter;
     close $fh;
+
+    # write to shell env $alios
+    for(@$filter){
+        open($fh, ">>", $alios) || die "cant open $alios:$!";
+        print $fh uc($_->{name}). '=' . $_->{path} . ';';
+        print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
+        print $fh $_->{name} . '=' . $_->{apid} . "\n";
+        close $fh;
+    }
+    $list->('alios');
 };
 
 # --searchmap appids
@@ -117,53 +128,41 @@ my $searchmap = sub {
                 }
                 # concatenate stored $alios_json w/ new map
                 @filter = (@filter, @f);
-
-                # write to shell env $alios
-                open($fh, ">>", $alios) || die "cant open $alios:$!";
-                print $fh uc($_->{name}). '=' . $_->{path} . ';';
-                print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
-                print $fh $_->{name} . '=' . $_->{apid} . "\n";
-                close $fh;
                 $write_alios->(\@filter);
-                $list->('alios');
         }
     } else {
         # trigered w/ -s option, list apid/apnr tree
         $filter = lc qr/$filter/;
         @filter = grep { lc $_->{apid} =~ /$filter/ } @{deserialize()};
-        print Dumper(\@filter);# and die;
+        #print Dumper(\@filter);# and die;
         return \@filter;
     }
 };      
 
 my $repath = sub {
-    my $broken = shift;
-    say colored(['black on_yellow'], " repath:"); #---------------debug
-    say "broken links:";
-    for(@$broken){
-        print colored(['black on_red'], "\t" . $_->{apid});
-        $init->();
-        $searchmap->($_->{apnr}, $_->{name});
-    }
+    my $plist = shift;
+    serialize();     
+    #say $plist;
+    find( 
+        sub { if($_ eq $plist){ 
+                say "$File::Find::dir/$_" }
+        }, @base
+    )
+    #\@repaired;
 };
-
+       
 my $check = sub {
-    say colored(['black on_yellow'], " check:"); #----------------debug
-    my @broken = ();
+    say "check: ";
     for(@{$stored->('alios')}){
-        if( ! -d $_->{path}){
-            say colored(['yellow'], $_->{apid});
-            push @broken, $_;
+        if( ! -f $_->{plist_path}){
+            $repath->($_->{plist}) and say "repath: broken link $_->{plist_path}";
         }
     }
-    $repath->(\@broken);
-    $list->('alios');
 };  
-
 
 sub serialize {
 # --json write
-    say colored(['black on_yellow'], " serialize:") . "json"; #---------------debug
+    say "serialize: ";
     open(my $jfh,">",$cache) || die "cant open $cache: $!";
     my $j = encode_json \@app;
     print $jfh $j;
@@ -193,17 +192,27 @@ my $repath2 = sub {
         
         
 # --write old+new values into $alios_json
+=head
+my $repath2 = sub {
+    open(my $fh,"<",$alios_json);
+    my $p = decode_json <$fh>;
+    for(@$p){
+      unless(-f $_->{plist}){
+        find( sub{ my $plist =~ qr/$_->{plist}/;
+                    if($File::Find
+      }
+    }
+};
+=cut
 
-    
 
 if(defined $option->{i}){
-    pulse_start( name => 'Initializing ', rotate => 1, time => 1, size => 20 );
-    $init->(); serialize() and say Dumper(deserialize());
-    pulse_stop();
-       
+    $init->() and die;
+    serialize() and say Dumper(deserialize());
+
 } elsif( defined $option->{f} ){
     print Dumper($searchmap->($option->{f}));
-} elsif( defined $option->{p} ){
+} elsif(defined $option->{p}){
     $check->();
 } elsif( defined $option->{m} ){
     $searchmap->($option->{m}, $option->{n});
@@ -220,12 +229,6 @@ if(defined $option->{i}){
 } else {
     $list->('alios');
 }
-
-    
-
-
-
-__DATA__
 
 =head1 NAME
 
