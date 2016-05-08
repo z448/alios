@@ -142,9 +142,10 @@ my $searchmap = sub {
 my $repath = sub {
     my $broken = shift;
     say colored(['black on_yellow'], " repath:"); #---------------debug
-    $init->(); 
-    serialize() and say 'initialized';
-    say "broken links:";
+    serialize() and say 'initialized';     
+    my @repath = grep{ $_ } @{deserialize()};
+ 
+       
     for(@$broken){
         print "repath broken link: $_->{plist_path}";
         $searchmap->($_->{apnr}, $_->{name});
