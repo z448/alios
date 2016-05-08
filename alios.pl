@@ -142,7 +142,8 @@ my $searchmap = sub {
 my $repath = sub {
     my $broken = shift;
     serialize();     
-    say $broken->[0]->{plist};
+    say $broken;
+    #say $broken->[0]->{plist};
     #@{deserialize()};
 =head1
     find( 
