@@ -140,25 +140,28 @@ my $searchmap = sub {
 };      
 
 my $repath = sub {
-    my $plist = shift;
+    my $broken = shift;
     serialize();     
-    #say $plist;
-    my @filter = @{deserialize()};
+    say $broken->[0]->{plist};
+    #@{deserialize()};
+=head1
     find( 
-        sub { if($_ eq $plist){ 
+        sub { if($_ eq $_->{plist}){ 
                 #say "$File::Find::dir/$_"; 
             my @f = grep { $_->{plist} eq $_ } @filter;
             say @f;
         }}, @base
     )
+    }
     #\@repaired;
+=cut
 };
        
 my $check = sub {
     say "check: ";
     for(@{$stored->('alios')}){
         if( ! -f $_->{plist_path}){
-            $repath->($_->{plist}) and say "repath: broken link $_->{plist_path}";
+            $repath->($_) and say "repath: broken link $_->{plist_path}";
         }
     }
 };  
