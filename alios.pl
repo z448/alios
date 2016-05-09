@@ -152,6 +152,7 @@ my $repath = sub {
             my @f = grep { $broken->{plist} eq $_ } @filter;
             @filter = (@filter, @f);
             $write_alios->(\@filter);
+            } else { say "no match" }
             #say @f;
         }}, @base
     )
