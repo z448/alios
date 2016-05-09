@@ -21,9 +21,9 @@ my ( $alios_json, $alios, $app, @app, @base, $cache ) = ();
 
 # --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
-$cache = ".alios.cache.json";
-$alios = "./.alios";
-$alios_json = "/var/mobile/alios.json";
+$cache = "/var/mobile/.alios.cache.json";
+$alios = "/var/mobile/.alios";
+$alios_json = "/var/mobile/.alios.json";
 
 my $init = sub {
     say colored(['black on_yellow'], " init:"); #----------------debug
@@ -193,16 +193,7 @@ sub deserialize {
     return \@$p;
 }
 
-my $repath2 = sub {
-    open(my $fh, "<",$alios_json);
-    my $j = <$fh>;
-    my $p = decode_json $j;
-    for(@$p){
-        unless(-f $_->{plist}){
-            $init->() and say "new path is $_->{plist}";
-        }
-    }
-};
+
         
     
         
