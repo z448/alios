@@ -1,4 +1,4 @@
-![alios logo](assets/logo50x50.jpg)
+![alios logo](assets/logo250x250.jpg)
 #### alios
 
 UPDATE: last version has no dependency on plutil. Also, the rest of this readme is outdated, see gif instead.
