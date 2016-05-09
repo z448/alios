@@ -147,16 +147,16 @@ my $repath = sub {
     #@{deserialize()};
 
     find( 
-        sub { if($_ eq $broken->{plist}){ 
-                $broken->{plist_path} = "$File::Find::dir/$_"; 
-            my @f = grep { 
-            $broken->{plist} eq $_ } @filter;
+        sub { 
+            if($_ eq $broken->{plist}){ 
+            $broken->{plist_path} = "$File::Find::dir/$_"; 
+            my @f = grep { $broken->{plist} eq $_ } @filter;
             @filter = (@filter, @f);
             $write_alios->(\@filter);
             } else { say "no match" }
             #say @f;
-        }}, @base
-    );
+        }, @base
+    )
     #\@repaired;
 };
        
