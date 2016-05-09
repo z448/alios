@@ -91,7 +91,7 @@ my $list = sub {
 my $write_alios = sub {
     my $filter = shift;
     open(my $fh,">",$alios_json) || die "cant open $alios_json:$!";
-    print $fh encode_json $filter;
+    print $fh encode_json $filter and say 'printed into $alios_json';
     close $fh;
 
     # write to shell env $alios
@@ -142,23 +142,32 @@ my $searchmap = sub {
 my $repath = sub {
     my $broken = shift;
     serialize();     
-    say $broken->{plist};
+    say 'repath: $broken->{plist} = ' . $broken->{plist};
     my @filter = @{$stored->()};
-    #@{deserialize()};
 
     find( 
         sub { 
             if($_ eq $broken->{plist}){ 
-            $broken->{plist_path} = "$File::Find::dir/$_"; 
-            my @f = grep { $broken->{plist_path} eq "$File::Find::dir/$_" } @filter;
-            @filter = (@filter, @f);
-            say @filter;
-            $write_alios->(\@filter);
+                $broken->{plist_path} = "$File::Find::dir/$_"; 
+                say 'Dumper($broken) = ' . Dumper($broken);
+                @filter = grep { $broken->{plist} eq $_ } @filter;
+                $write_alios->(\@filter);
+
+                $broken->{plist_path} = "$File::Find::dir/$_"; 
+                push @filter, $broken; 
+                say 'Dumper(@filter) = ' . Dumper(@filter);
+                $write_alios->(\@filter);
+                open(my $fh,"> ./.alios.json") || die "cant write to $alios_json: $!";
+                print $fh encode_json \@filter;
+                close $fh;
+                #say '$broken->{plist} = ' . $broken->{plist};
+                #say '$_ = ' . $_;
+                #say '@f = ' . @f;
+                #push @filter, $broken;
+                #@filter = (@filter, [$broken]);
             } #else { say "no match" }
-            #say @f;
         }, @base
     )
-    #\@repaired;
 };
        
 my $check = sub {

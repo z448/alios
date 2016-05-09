@@ -13,8 +13,9 @@ my $uuid  = sub { return uc create_uuid_as_string(UUID_V1) };
 my $uuid1 = $uuid->();
 my $uuid2 = $uuid->();
 
-my @containers = (qq|Containers/Data/Application/$uuid1/Library/Preferences|, qq|Containers/Shared/AppGroup/$uuid2/Library/Preferences|);
-my $plist = "test.alios.plist";
+#my @containers = (qq|Containers/Data/Application/$uuid1/Library/Preferences|, qq|Containers/Shared/AppGroup/$uuid2/Library/Preferences|);
+my @containers = (qq|Containers/Data/Application/$uuid1/Library/Preferences|);
+my $plist = "com.test.plist";
 
 if($switch eq '-d'){
     #remove_tree("$ENV{HOME}/$contain") or die "$!";
