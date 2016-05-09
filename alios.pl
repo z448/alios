@@ -23,7 +23,7 @@ my ( $alios_json, $alios, $app, @app, @base, $cache ) = ();
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 $cache = ".alios.cache.json";
 $alios = "./.alios";
-$alios_json = "./.alios.json";
+$alios_json = "/var/mobile/alios.json";
 
 my $init = sub {
     say colored(['black on_yellow'], " init:"); #----------------debug
@@ -149,23 +149,20 @@ my $repath = sub {
         sub { 
             if($_ eq $broken->{plist}){ 
                 $broken->{plist_path} = "$File::Find::dir/$_"; 
-                say 'Dumper($broken) = ' . Dumper($broken);
+                #say 'Dumper($broken) = ' . Dumper($broken);
                 @filter = grep { $broken->{plist} eq $_ } @filter;
                 $write_alios->(\@filter);
 
                 $broken->{plist_path} = "$File::Find::dir/$_"; 
+                $broken->{plist} = "$_";
+                $broken->{uuid} = $broken->{plist_path};
+                $broken->{uuid} =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4/;
+                $broken->{uuid} = $3;
+                $broken->{path} = $1 . $2 . $3;
+
                 push @filter, $broken; 
-                say 'Dumper(@filter) = ' . Dumper(@filter);
-                $write_alios->(\@filter);
-                open(my $fh,"> ./.alios.json") || die "cant write to $alios_json: $!";
-                print $fh encode_json \@filter;
-                close $fh;
-                #say '$broken->{plist} = ' . $broken->{plist};
-                #say '$_ = ' . $_;
-                #say '@f = ' . @f;
-                #push @filter, $broken;
-                #@filter = (@filter, [$broken]);
-            } #else { say "no match" }
+                write_alios->(\@filter);
+            } 
         }, @base
     )
 };
