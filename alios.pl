@@ -23,7 +23,7 @@ my ( $alios_json, $alios, $app, @app, @base, $cache ) = ();
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 $cache = ".alios.cache.json";
 $alios = "./.alios";
-$alios_json = "./.alios.json";
+$alios_json = "./alios.json";
 
 my $init = sub {
     say colored(['black on_yellow'], " init:"); #----------------debug
@@ -139,6 +139,14 @@ my $searchmap = sub {
     }
 };      
 
+sub writejson {
+        my $fff = shift;
+        unlink($alios_json);
+        open(my $fh,"> $alios_json") || die "cant write to $alios_json: $!";
+        print $fh encode_json $fff;
+        close $fh;
+}
+
 my $repath = sub {
     my $broken = shift;
     serialize();     
@@ -151,15 +159,13 @@ my $repath = sub {
                 $broken->{plist_path} = "$File::Find::dir/$_"; 
                 say 'Dumper($broken) = ' . Dumper($broken);
                 @filter = grep { $broken->{plist} eq $_ } @filter;
-                $write_alios->(\@filter);
 
                 $broken->{plist_path} = "$File::Find::dir/$_"; 
                 push @filter, $broken; 
                 say 'Dumper(@filter) = ' . Dumper(@filter);
-                $write_alios->(\@filter);
-                open(my $fh,"> ./.alios.json") || die "cant write to $alios_json: $!";
-                print $fh encode_json \@filter;
-                close $fh;
+                writejson(\@filter);
+
+                #$write_alios->(\@filter);
                 #say '$broken->{plist} = ' . $broken->{plist};
                 #say '$_ = ' . $_;
                 #say '@f = ' . @f;
