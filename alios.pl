@@ -1,10 +1,9 @@
 #!/usr/bin/env perl
-#
+
 use 5.010;
 use warnings;
 use strict;
 
-#use Term::Pulse;
 use File::Find;
 use Term::ANSIColor;
 use Encode;
@@ -16,19 +15,18 @@ use open qw< :encoding(UTF-8) >;
 
 my $option = {};
 getopts('rhsm:d:n:f:pi', $option);
-my $apnr = 0;
-my ( $alios_json, $alios, $app, @app, @base, $cache ) = ();
+my ($alios_json, $alios, $app, @app, @base, $cache, $r) = ();
 
-# --- is in 'config';  DELETE
 @base = ("$ENV{HOME}/Containers/Data/Application","$ENV{HOME}/Containers/Shared/AppGroup");
 $cache = "/var/mobile/.alios.cache.json";
 $alios = "/var/mobile/.alios";
 $alios_json = "/var/mobile/.alios.json";
 
 my $init = sub {
-    say colored(['black on_yellow'], " init:"); #----------------debug
+    say colored(['black on_yellow'], " init:");
     find( sub{ 
         my %app = ();
+        my $apnr = 0;
         if( "$File::Find::dir/$_" =~ /Library\/Preferences\/.*\.plist/){
             my $match = "$File::Find::dir/$_";
             $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
@@ -40,23 +38,22 @@ my $init = sub {
             $app{uuid} = $3;
             push @app,{%app};
             $apnr++;
-        } #else { print "$_ \," }
     },  @base );
 };
 
+# reset; remove entrys in ~/.alioa
 my $reset = sub {
     my $init_alios_json = '[{"name":"test"}]';
     open(my $fh,">",$alios_json) || die "cant open $alios_json";
     print $fh $init_alios_json;
     close $fh;
-    ######open???
     return $init_alios_json;
 };
 
+# read stored values;
 my $stored = sub {
     my $filter = shift;
     my @filter = ();
-# read stored values;
     if( ! -f $alios_json ){
         @filter = @{ decode_json $reset->() };
     } else {
@@ -87,14 +84,13 @@ my $list = sub {
     }
 };
 
-
+# write to shell env $alios
 my $write_alios = sub {
     my $filter = shift;
     open(my $fh,">",$alios_json) || die "cant open $alios_json:$!";
-    print $fh encode_json $filter and say 'printed into $alios_json';
+    print $fh encode_json $filter;
     close $fh;
 
-    # write to shell env $alios
     for(@$filter){
         open($fh, ">>", $alios) || die "cant open $alios:$!";
         print $fh uc($_->{name}). '=' . $_->{path} . ';';
@@ -105,19 +101,20 @@ my $write_alios = sub {
     $list->('alios');
 };
 
-# --searchmap appids
-my $searchmap = sub {
+# search appids
+my $search = sub {
     my ($filter, $name) = @_;
     my (@filter, @alios, $fh) = ();
 
     @filter = @{$stored->()};
-    # delete entry from $alios_json
+# delete entry from $alios_json
     if(defined $option->{d}){
         @alios = grep { $_->{name} ne $filter } @filter;
         $write_alios->(\@alios);
         $list->('alios');
     } 
     elsif( defined $option->{m} and defined $option->{n}){
+# map
         my @f = grep { $_->{apnr} eq $filter } @{deserialize()};
         for(@f){
                 if(defined $option->{n}){
@@ -148,8 +145,8 @@ my $repath = sub {
     find( 
         sub { 
             if($_ eq $broken->{plist}){ 
-                $broken->{plist_path} = "$File::Find::dir/$_"; 
-                #say 'Dumper($broken) = ' . Dumper($broken);
+                $broken->{plist_path} "$File::Find::dir/$_"; 
+                
                 @filter = grep { $broken->{plist} eq $_ } @filter;
                 $write_alios->(\@filter);
 
@@ -166,7 +163,8 @@ my $repath = sub {
         }, @base
     )
 };
-       
+
+# check broken paths  
 my $check = sub {
     say "check: ";
     for(@{$stored->('alios')}){
@@ -176,16 +174,16 @@ my $check = sub {
     }
 };  
 
+# json write
 sub serialize {
     $init->();
-# --json write
     say "serialize: ";
     open(my $jfh,">",$cache) || die "cant open $cache: $!";
     my $j = encode_json \@app;
     print $jfh $j;
 }
 
-# --json read
+# json read
 sub deserialize {
     open(my $jfh,"<",$cache) || die "cant open $cache: $!";
     my $j = <$jfh>;
@@ -193,38 +191,18 @@ sub deserialize {
     return \@$p;
 }
 
-
-        
-    
-        
-        
-# --write old+new values into $alios_json
-=head
-my $repath2 = sub {
-    open(my $fh,"<",$alios_json);
-    my $p = decode_json <$fh>;
-    for(@$p){
-      unless(-f $_->{plist}){
-        find( sub{ my $plist =~ qr/$_->{plist}/;
-                    if($File::Find
-      }
-    }
-};
-=cut
-
-
 if(defined $option->{i}){
     $init->() and die;
     serialize() and say Dumper(deserialize());
 
 } elsif( defined $option->{f} ){
-    print Dumper($searchmap->($option->{f}));
+    print Dumper($search->($option->{f}));
 } elsif(defined $option->{p}){
     $check->();
 } elsif( defined $option->{m} ){
-    $searchmap->($option->{m}, $option->{n});
+    $search->($option->{m}, $option->{n});
 } elsif(defined $option->{d}){
-    say Dumper($searchmap->($option->{d}));
+    say Dumper($search->($option->{d}));
 } elsif(defined $option->{r}){
     my $jtest = $reset->();
     my $ptest = decode_json $jtest;
@@ -249,13 +227,13 @@ back
 
 =over 10
 
+=item source ~/.alios from ~/.bashrc
+
+C<alios -p && source ~/.alios>
+
 =item initialize
 
 C<alios -i>
-
-=item C<source from ~/.bashrc or ~/.bash_profile>
-
-C<alios -p && source ~/.alios>
 
 =item map alias
 
@@ -271,11 +249,13 @@ C<alios>
 
 =item list all display IDs in ~/Container directory
 
+C<alios -s>
+
 =item search app
 
 C<alios -f keyword>
 
-=item reset ( clear all entrys in ~/.alios config )
+=item reset; clear all entrys in ~/.alios config
 
 C<alios -r>
 
