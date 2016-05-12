@@ -38,7 +38,7 @@ my $init = sub {
             $app{uuid} = $3;
             push @app,{%app};
             $apnr++;
-    },  @base );
+    }},  @base );
 };
 
 # reset; remove entrys in ~/.alioa
@@ -145,7 +145,7 @@ my $repath = sub {
     find( 
         sub { 
             if($_ eq $broken->{plist}){ 
-                $broken->{plist_path} "$File::Find::dir/$_"; 
+                $broken->{plist_path} = "$File::Find::dir/$_"; 
                 
                 @filter = grep { $broken->{plist} eq $_ } @filter;
                 $write_alios->(\@filter);
