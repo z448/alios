@@ -23,10 +23,10 @@ $alios = "/var/mobile/.alios";
 $alios_json = "/var/mobile/.alios.json";
 
 my $init = sub {
+    my $apnr = 0;
     say colored(['black on_yellow'], " init:");
     find( sub{ 
         my %app = ();
-        my $apnr = 0;
         if( "$File::Find::dir/$_" =~ /Library\/Preferences\/.*\.plist/){
             my $match = "$File::Find::dir/$_";
             $match =~ s/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/$1$2$3$4$5$6/;
