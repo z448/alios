@@ -11,9 +11,9 @@ Works after backup/restore as config is written into sanboxed UUID app directory
 ![alios](https://raw.githubusercontent.com/z448/alios/master/alios.gif)
 
 
-Add to your `~/.bash_profile` file
+Add to your `~/.bashrc` file
 
-`. ~/.alios`
+`alios -p && . ~/.alios`
 
 Place alios in $PATH and run with `-a` to do initial chceck.
 
