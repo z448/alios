@@ -5,7 +5,7 @@
 
 UPDATE: last version has no dependency on plutil.
 
-**bash** script for ios to map custom alias name to **UUID** directory. Keeps track of any changes in UUID and rewrite alias path so choosen alias names stay updated.
+**bash/perl** script for ios to map custom alias name to **UUID** directory. Keeps track of any changes in UUID and rewrite alias path so choosen alias names stay updated.
 
 ##INSTALLATION
 
