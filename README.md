@@ -38,13 +38,17 @@ map apps
 **if you have perl installed**
 Map alios using `-m` option with number beside app name and `-n` with custom name, then source ~/.alios or restart session. Highlighted names are optional, you can choose any name you want.
 
-`alios -m 123 -n someName`
+```bash
+alios -m 123 -n someName
+```
 `. ~/.alios` or `bash`
 
 **if you dont have perl installed**
 Map alios using `-m` option with number beside app name followed by custom name, then source ~/.alios or restart session. Highlighted names are optional, you can choose any name you want.
 
-`alios -m 123 someName`
+```bash
+alios -m 123 someName
+```
 `. ~/.alios` or `bash`
 
 search apps
