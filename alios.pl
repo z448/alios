@@ -94,13 +94,13 @@ my $write_alios = sub {
     close $fh;
 
     # write to shell env $alios
+        open($fh, ">", $alios) or die "cant open $alios:$!";
     for(@$filter){
-        open($fh, ">>", $alios) or die "cant open $alios:$!";
         print $fh uc($_->{name}). '=' . $_->{path} . ';';
         print $fh 'alias ' .  $_->{name} . '="cd ' . $_->{path} . '"' . ';';
         print $fh $_->{name} . '=' . $_->{apid} . "\n";
-        close $fh;
     }
+    close $fh;
     $list->('alios');
 };
 
@@ -140,7 +140,7 @@ my $searchmap = sub {
 
 my $repath = sub {
     my $broken = shift;
-    #serialize();     
+    serialize();     
     say 'repath: $broken->{plist} = ' . $broken->{plist};
     #my @filter = @{$stored->()};
     my $remove = $broken->{plist};
@@ -154,15 +154,17 @@ my $repath = sub {
                 $broken->{plist} = "$_";
                 #$broken->{uuid} = $broken->{plist_path};
                 $broken->{plist_path} =~ m/(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/;
-#                print "#########$1 - $2 - $3"; 
+                print "found plist $_"; 
                 $broken->{path} = $1 . $2 . $3;
                 $broken->{uuid} = $3;
 
                 push @filter, {%$broken}; 
-                $write_alios->(\@filter);
+                return;
+                #$write_alios->(\@filter);
             } 
         }, @base
-    )
+    );
+    $write_alios->(\@filter);
 };
        
 my $check = sub {
