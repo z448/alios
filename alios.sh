@@ -1,12 +1,21 @@
 #!/bin/bash
 
-cache=~/.alios.cache
-tmp=~/.alios.tmp
 conf=~/.alios
+cache=~/.alios.cache
 groupid="group"
 
 paths=( /var/mobile/Containers/Data/Application/*/Library/Preferences\
         /var/mobile/Containers/Shared/AppGroup/*/Library/Preferences    )
+
+ver="2.5.1"
+
+if [[ ! -f $conf ]]; then
+    touch $conf
+fi
+
+function version {
+    echo $ver
+}
 
 function check_plist {
     let z=0;     
@@ -116,6 +125,8 @@ elif [ "$1" = "-d" ]; then
     delete_alios $2;
 elif [ "$1" = "-i" ]; then
     init $2
+elif [ "$1" = "-v" ]; then
+    version
 else
     current_settings
 fi
