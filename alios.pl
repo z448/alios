@@ -17,9 +17,17 @@ use autodie;
 my $opt = {};
 getopts('sd:pm:n:h', $opt);
 
-my $MYHOME = "/home/z/Documents/alios/dev/var/mobile";
+#my $MYHOME = "/var/mobile";
+my $MYHOME = "/home/z/alios/dev/var/mobile";
 my $base = ["$MYHOME/Containers/Data/Application","$MYHOME/Containers/Shared/AppGroup"];
 my $conf = "$MYHOME/.alios";
+
+
+unless( -e $conf ){
+	open(my $fh, '>>', $conf);
+	close $fh;
+}
+
 
 sub init {
 	my %app = ();
@@ -55,7 +63,6 @@ my $map = sub {
 		close $fh;
 	}
 
-	print "ok.\n";
 	show();
 	print "\n'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n";
 };
@@ -77,12 +84,11 @@ sub del {
 		close $fh;
 	}
 	
-	print "ok.\n";
 	show();
 	print "\nRestart shell session '" . colored(['bold white'], "exec \$SHELL") . "' to make changes available.\n";
 };
 
-sub repath {
+sub conf {
 	
 	my $heal = sub {
 		my $cfapps = shift;
@@ -110,7 +116,8 @@ sub repath {
 			}
 		}
 	};
-
+	
+	my $h = shift || 0;
 	my @app = ();
 	open(my $fh, "<", $conf);
 	while(<$fh>){
@@ -132,7 +139,7 @@ sub repath {
 		push @app, \%app;
 	}
 	close $fh;
-	$heal->(\@app);
+	$heal->(\@app) if $h;
 	\@app;
 };
 
@@ -144,7 +151,7 @@ sub search {
 };
 
 sub show {
-	my $apps = repath;
+	my $apps = conf;
 	print colored(['black on_yellow'], " alios"); for my $app(@$apps){ print " $app->{alios}" }; print " " . colored(['black on_yellow'], " ") . "\n";
 };
 
@@ -162,7 +169,7 @@ sub help {
 
 if($opt->{m} and $opt->{n}){ $map->($opt->{m}, $opt->{n}) }
 elsif($opt->{s}){ search }
-elsif($opt->{p}){ repath }
+elsif($opt->{p}){ conf(1) }
 elsif($opt->{d}){ del($opt->{d}) }
 elsif($opt->{h}){ help }
 else { show };

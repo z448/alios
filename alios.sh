@@ -46,8 +46,7 @@ function map_plist {
    source "$cache"
    request=$1
    echo -ne "alias $2='cd ${app[$request]}'""\n${2^^}=${app[$request]}\n${2}=${open[$request]}\n" >> $conf
-   echo -ne "ok.\n
-Now '\e[1msource ~/.alios\e[0m' so you can start using created alios.\n"
+   echo -ne "\n'\e[1msource ~/.alios\e[0m' to make changes available.\n"
 }
 
 function find_file {
@@ -67,6 +66,7 @@ function delete_alios {
    fi
    done < $conf
    mv $tmp $conf
+   echo -ne "\n\eRestart shell session '[1mexec \$SHELL\e[0m' to make changes available.\n"
    }
 
 function current_settings {
