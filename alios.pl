@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 
 use 5.010;
-use warnings;
 use strict;
+use warnings;
 
 use File::Find;
 use Term::ANSIColor;
@@ -15,19 +15,21 @@ use open qw< :encoding(UTF-8) >;
 use autodie;
 
 my $opt = {};
-getopts('sd:pm:n:h', $opt);
+getopts('vsd:pm:n:h', $opt);
 
-#my $MYHOME = "/var/mobile";
-my $MYHOME = "/home/z/alios/dev/var/mobile";
-my $base = ["$MYHOME/Containers/Data/Application","$MYHOME/Containers/Shared/AppGroup"];
-my $conf = "$MYHOME/.alios";
+our $VERSION;
+BEGIN {
+	$VERSION = 'v2.6.2';
+}
 
+$ENV{'HOME'} = "/home/z/alios/dev/var/mobile";
+my $base = ["$ENV{'HOME'}/Containers/Data/Application","$ENV{'HOME'}/Containers/Shared/AppGroup"];
+my $conf = "$ENV{'HOME'}/.alios";
 
 unless( -e $conf ){
 	open(my $fh, '>>', $conf);
 	close $fh;
 }
-
 
 sub init {
 	my %app = ();
@@ -50,6 +52,10 @@ sub init {
 	}, @$base);
 	\@app;
 };
+
+sub version {
+	print "$VERSION\n";
+}
 
 my $map = sub {
 	my($apnr, $alios) = @_;
@@ -172,6 +178,7 @@ elsif($opt->{s}){ search }
 elsif($opt->{p}){ conf(1) }
 elsif($opt->{d}){ del($opt->{d}) }
 elsif($opt->{h}){ help }
+elsif($opt->{v}){ version }
 else { show };
 
 

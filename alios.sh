@@ -7,14 +7,14 @@ groupid="group"
 paths=( /var/mobile/Containers/Data/Application/*/Library/Preferences\
         /var/mobile/Containers/Shared/AppGroup/*/Library/Preferences    )
 
-ver="2.5.1"
+ver="2.6.2"
 
 if [[ ! -f $conf ]]; then
     touch $conf
 fi
 
 function version {
-    echo $ver
+    echo "v$ver"
 }
 
 function check_plist {
