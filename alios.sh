@@ -7,7 +7,7 @@ groupid="group"
 paths=( /var/mobile/Containers/Data/Application/*/Library/Preferences\
         /var/mobile/Containers/Shared/AppGroup/*/Library/Preferences    )
 
-ver="2.6.2"
+ver="2.6.4"
 
 if [[ ! -f $conf ]]; then
     touch $conf

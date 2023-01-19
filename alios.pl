@@ -19,7 +19,7 @@ getopts('vsd:pm:n:h', $opt);
 
 our $VERSION;
 BEGIN {
-	$VERSION = 'v2.6.3';
+	$VERSION = 'v2.6.4';
 }
 
 #$ENV{'HOME'} = "/home/z/alios/dev/var/mobile";
