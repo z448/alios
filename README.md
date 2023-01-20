@@ -14,7 +14,7 @@ cd alios/deb
 sudo dpkg -i alios-iphoneos-arm-2.6.5.deb
 ```
 
-switch to 'mobile' and add to your '~/.bashrc' file
+add to your '~/.bashrc' file
 
 ```bash
 echo "alios -p && . ~/.alios" >> ~/.bashrc
