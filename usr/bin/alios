@@ -19,10 +19,9 @@ getopts('vsd:pm:n:h', $opt);
 
 our $VERSION;
 BEGIN {
-	$VERSION = 'v2.6.7';
+	$VERSION = 'v2.6.9';
 }
 
-#$ENV{'HOME'} = "/var/mobile";
 my $base = ["/var/mobile/Containers/Data/Application","/var/mobile/Containers/Shared/AppGroup"];
 my $conf = "$ENV{'HOME'}/.alios";
 
@@ -163,9 +162,11 @@ sub show {
 
 sub help {
 	print "\n" . colored(['bold white'], "alios") . " - tool for quick jumps into app folders. Creates alias 'app', shell variable '\$APP' holding app folder path and shell variable '\$app' holding app id.\n"
+	. "\t" . colored(['bold white'], "-v") . " show version\n"
 	. "\t" . colored(['bold white'], "-s") . " search for available apps\n"
 	. "\t" . colored(['bold white'], "-m") . " map alios\n"
 	. "\t" . colored(['bold white'], "-d") . " delete mapped alios\n"
+	. "\t" . colored(['bold white'], "-h") . " show this help\n"
 	. colored(['bold white'], "E.g") . "\n"
 	. "\t'" . colored(['bold white'], "alios -s") . "' search for available apps\n"
 	. "\t'" . colored(['bold white'], "alios -m 44 -n name") . "' map 44th app to name\n"
@@ -188,11 +189,13 @@ alios - tool for quick jumps into app folders
 
 =head1 VERSION
 
-This document describes alios version 2.6
+This document describes alios version $VERSION
 
 =head1 SYNOPSIS
 
 =over 10
+
+=item C<-v> show version 
 
 =item C<-p> repath  
 
