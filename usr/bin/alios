@@ -22,7 +22,7 @@ BEGIN {
 	$VERSION = 'v2.6.4';
 }
 
-#$ENV{'HOME'} = "/home/z/alios/dev/var/mobile";
+$ENV{'HOME'} = "/var/mobile";
 my $base = ["$ENV{'HOME'}/Containers/Data/Application","$ENV{'HOME'}/Containers/Shared/AppGroup"];
 my $conf = "$ENV{'HOME'}/.alios";
 
