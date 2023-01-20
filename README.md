@@ -11,7 +11,7 @@ cd alios/deb
 ```
 
 ```bash
-sudo dpkg -i alios-iphoneos-arm-2.6.5.deb
+sudo dpkg -i alios-iphoneos-arm-2.6.9.deb
 ```
 
 add to your '~/.bashrc' file
