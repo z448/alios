@@ -7,12 +7,11 @@ INSTALLATION
 
 ```bash
 git clone https://github.com/z448/alios
-cd alios
+cd alios/deb
 ```
-switch to 'root' and install with 'dpkg'
 
 ```bash
-dpkg -i alios.deb
+sudo dpkg -i alios-iphoneos-arm-2.6.5.deb
 ```
 
 switch to 'mobile' and add to your '~/.bashrc' file
