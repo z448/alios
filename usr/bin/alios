@@ -19,11 +19,11 @@ getopts('vsd:pm:n:h', $opt);
 
 our $VERSION;
 BEGIN {
-	$VERSION = 'v2.6.4';
+	$VERSION = 'v2.6.7';
 }
 
-$ENV{'HOME'} = "/var/mobile";
-my $base = ["$ENV{'HOME'}/Containers/Data/Application","$ENV{'HOME'}/Containers/Shared/AppGroup"];
+#$ENV{'HOME'} = "/var/mobile";
+my $base = ["/var/mobile/Containers/Data/Application","/var/mobile/Containers/Shared/AppGroup"];
 my $conf = "$ENV{'HOME'}/.alios";
 
 unless( -e $conf ){
