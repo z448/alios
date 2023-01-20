@@ -1,0 +1,5 @@
+#force reinstall
+#https://askubuntu.com/questions/525088/how-to-delete-broken-packages-in-ubuntu
+
+dpkg -i --force-overwrite package.deb
+
