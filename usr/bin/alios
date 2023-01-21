@@ -19,7 +19,7 @@ getopts('vsd:pm:n:h', $opt);
 
 our $VERSION;
 BEGIN {
-	$VERSION = 'v2.7.8';
+	$VERSION = 'v2.7.9';
 }
 
 my $base = ["/var/mobile/Containers/Data/Application","/var/mobile/Containers/Shared/AppGroup"];
