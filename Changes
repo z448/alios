@@ -1,0 +1,6 @@
+Revision history for Perl extension App::alios.
+
+0.01  Sat Jan 21 18:23:53 2023
+	- original version; created by h2xs 1.23 with options
+		-AX -n App::alios
+

@@ -1,26 +1,27 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
+use utf8;
 use 5.010;
+
+package App::alios;
+
 use strict;
 use warnings;
 
+use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
+
+$VERSION = 'v2.8.2';
+
+@EXPORT_OK = qw( map del conf );
+%EXPORT_TAGS = (
+	'all' => [ @EXPORT_OK ],
+);
+
 use File::Find;
 use Term::ANSIColor;
-use Encode;
-use Data::Dumper;
-use Term::ANSIColor;
 use Getopt::Std;
-use JSON::PP qw< encode_json decode_json>;
 use open qw< :encoding(UTF-8) >;
 use autodie;
-
-my $opt = {};
-getopts('vsd:pm:n:h', $opt);
-
-our $VERSION;
-BEGIN {
-	$VERSION = 'v2.8.1';
-}
 
 my $base = ["/var/mobile/Containers/Data/Application","/var/mobile/Containers/Shared/AppGroup"];
 my $conf = "$ENV{'HOME'}/.alios";
@@ -52,11 +53,7 @@ sub init {
 	\@app;
 };
 
-sub version {
-	print "$VERSION\n";
-}
-
-my $map = sub {
+sub map {
 	my($apnr, $alios) = @_;
 	my $app = init;
 	my $VAR = uc $alios;
@@ -67,10 +64,9 @@ my $map = sub {
 		print $fh "$VAR=$_->{path};alias $_->{alios}=\"cd $_->{path}\";$_->{alios}=$_->{id}\n";
 		close $fh;
 	}
-
 	show();
 	print "\n'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n";
-};
+}
 
 sub del {
 	my $alios = shift;
@@ -148,81 +144,18 @@ sub conf {
 	\@app;
 };
 
-sub search {
-	my $app = init;
-	for(@$app){
-		print " " x (length $_->{id}) . colored(['yellow'], "$_->{name}") . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{nr}") . "\n"; 
-	}
-};
+=head1 SOURCE AVAILABILITY
 
-sub show {
-	my $apps = conf;
-	print colored(['black on_yellow'], " alios "); for my $app(@$apps){ print " $app->{alios}" }; print " " . colored(['black on_yellow'], " ") . "\n";
-};
+	https://github.com/z448/alios
 
-sub help {
-	print "\n" . colored(['bold white'], "alios") . " - tool for quick jumps into app folders. Creates alias 'app', shell variable '\$APP' holding app folder path and shell variable '\$app' holding app id.\n"
-	. "\t" . colored(['bold white'], "-v") . " show version\n"
-	. "\t" . colored(['bold white'], "-s") . " search for available apps\n"
-	. "\t" . colored(['bold white'], "-m") . " map alios\n"
-	. "\t" . colored(['bold white'], "-d") . " delete mapped alios\n"
-	. "\t" . colored(['bold white'], "-h") . " show this help\n"
-	. colored(['bold white'], "E.g") . "\n"
-	. "\t'" . colored(['bold white'], "alios -s") . "' search for available apps\n"
-	. "\t'" . colored(['bold white'], "alios -m 44 -n name") . "' map 44th app to name\n"
-	. "\t'" . colored(['bold white'], "alios") . "' list alios\n"
-	. "\t'" . colored(['bold white'], "alios -d name") . "' delete alios\n\n";
-};
+=head1 AUTHOR
 
-if($opt->{m} and $opt->{n}){ $map->($opt->{m}, $opt->{n}) }
-elsif($opt->{s}){ search }
-elsif($opt->{p}){ conf(1) }
-elsif($opt->{d}){ del($opt->{d}) }
-elsif($opt->{h}){ help }
-elsif($opt->{v}){ version }
-else { show };
+Zdeněk Bohuněk, C<< <4zdenek@gmail.com> >>
 
+Copyright © 2016-2023, Zdeněk Bohuněk C<< <4zdenek@gmail.com> >>. All rights reserved. 
 
-=head1 NAME
-
-alios - tool for quick jumps into app folders 
-
-=head1 VERSION
-
-This document describes alios version $VERSION
-
-=head1 SYNOPSIS
-
-=over 10
-
-=item C<-v> show version 
-
-=item C<-p> repath  
-
-=item C<-s> search for available apps
-
-=item C<-m> map alios
-
-=item C<-d> delete alios
-
-=item C<-h> show help
-
-=back
-
-=head1 DESCRIPTION
-
-Creates shell variable '$APP' holding app home folder path, alias 'app' pointing to app home folder and shell variable '$app' holding app id.
-
-=head1 EXAMPLES
-
-C<alios -p> repath path to app home folders
-
-C<alios -s> search for available apps
-
-C<alios -m 44 -n name> map 44th app to name
-
-C<alios> list alioses
-
-C<alios -d name> delete alios
+This code is available under the Artistic License 2.0.
 
 =cut
+
+1;

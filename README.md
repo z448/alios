@@ -6,16 +6,8 @@ alios - tool for quick jumps into app folders
 INSTALLATION
 
 ```bash
-git clone https://github.com/z448/alios
-cd alios/deb
+cpan App::alios
 ```
-
-```bash
-sudo dpkg -i alios-iphoneos-arm-2.6.9.deb
-```
-
-add to your '~/.bashrc' file
-
 ```bash
 echo "alios -p && . ~/.alios" >> ~/.bashrc
 ```

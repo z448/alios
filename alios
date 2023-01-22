@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+
+use utf8;
+use 5.010;
+
+use strict;
+use warnings;
+
+use App::alios qw(:all);
+
+use File::Find;
+use Term::ANSIColor;
+use Getopt::Std;
+use open qw< :encoding(UTF-8) >;
+use autodie;
+
+$VERSION = 'v2.8.2';
+
+my $opt = {};
+getopts('vsd:pm:n:h', $opt);
+
+sub version {
+	print "$VERSION\n";
+}
+
+sub search {
+	my $app = init;
+	for(@$app){
+		print " " x (length $_->{id}) . colored(['yellow'], "$_->{name}") . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{nr}") . "\n"; 
+	}
+}
+
+sub show {
+	my $apps = conf;
+	print colored(['black on_yellow'], " alios "); for my $app(@$apps){ print " $app->{alios}" }; print " " . colored(['black on_yellow'], " ") . "\n";
+}
+
+sub help {
+	print "\n" . colored(['bold white'], "alios") . " - tool for quick jumps into app folders. Creates alias 'app', shell variable '\$APP' holding app folder path and shell variable '\$app' holding app id.\n"
+	. "\t" . colored(['bold white'], "-v") . " show version\n"
+	. "\t" . colored(['bold white'], "-s") . " search for available apps\n"
+	. "\t" . colored(['bold white'], "-m") . " map alios\n"
+	. "\t" . colored(['bold white'], "-d") . " delete mapped alios\n"
+	. "\t" . colored(['bold white'], "-h") . " show this help\n"
+	. colored(['bold white'], "E.g") . "\n"
+	. "\t'" . colored(['bold white'], "alios -s") . "' search for available apps\n"
+	. "\t'" . colored(['bold white'], "alios -m 44 -n name") . "' map 44th app to name\n"
+	. "\t'" . colored(['bold white'], "alios") . "' list alios\n"
+	. "\t'" . colored(['bold white'], "alios -d name") . "' delete alios\n\n";
+}
+
+if($opt->{m} and $opt->{n}){ $map->($opt->{m}, $opt->{n}) }
+elsif($opt->{s}){ search }
+elsif($opt->{p}){ conf(1) }
+elsif($opt->{d}){ del($opt->{d}) }
+elsif($opt->{h}){ help }
+elsif($opt->{v}){ version }
+else { show };
+
+=head1 NAME
+
+alios - tool for quick jumps into app folders 
+
+=head1 VERSION
+
+This document describes alios version $VERSION
+
+=head1 SYNOPSIS
+
+=over 10
+
+=item C<-v> show version 
+
+=item C<-p> repath  
+
+=item C<-s> search for available apps
+
+=item C<-m> map alios
+
+=item C<-d> delete alios
+
+=item C<-h> show help
+
+=back
+
+=head1 DESCRIPTION
+
+Creates shell variable '$APP' holding app home folder path, alias 'app' pointing to app home folder and shell variable '$app' holding app id.
+
+=head1 EXAMPLES
+
+C<alios -p> repath path to app home folders
+
+C<alios -s> search for available apps
+
+C<alios -m 44 -n name> map 44th app to name
+
+C<alios> list alioses
+
+C<alios -d name> delete alios
+
+=cut
