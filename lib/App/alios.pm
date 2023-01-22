@@ -10,7 +10,7 @@ use warnings;
 
 use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
-$VERSION = 'v2.8.2';
+$VERSION = 'v2.8.3';
 
 @EXPORT_OK = qw( init del conf mapp );
 %EXPORT_TAGS = (

@@ -16,7 +16,7 @@ use Getopt::Std;
 use open qw< :encoding(UTF-8) >;
 use autodie;
 
-$VERSION = 'v2.8.2';
+$VERSION = 'v2.8.3';
 
 my $opt = {};
 getopts('vsd:pm:n:h', $opt);
