@@ -12,10 +12,12 @@ use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
 $VERSION = 'v2.8.2';
 
-@EXPORT_OK = qw( map del conf );
+@EXPORT_OK = qw( init del conf mapp );
 %EXPORT_TAGS = (
 	'all' => [ @EXPORT_OK ],
 );
+
+use Exporter qw(import);
 
 use File::Find;
 use Term::ANSIColor;
@@ -54,7 +56,7 @@ sub init {
 	\@app;
 };
 
-sub map {
+sub mapp {
 	my($apnr, $alios) = @_;
 	my $app = init;
 	my $VAR = uc $alios;
@@ -65,7 +67,6 @@ sub map {
 		print $fh "$VAR=$_->{path};alias $_->{alios}=\"cd $_->{path}\";$_->{alios}=$_->{id}\n";
 		close $fh;
 	}
-	show();
 	print "\n'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n";
 }
 
@@ -86,7 +87,6 @@ sub del {
 		close $fh;
 	}
 	
-	show();
 	print "\nRestart shell session '" . colored(['bold white'], "exec \$SHELL") . "' to make changes available.\n";
 };
 

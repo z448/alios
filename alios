@@ -6,6 +6,8 @@ use 5.010;
 use strict;
 use warnings;
 
+use vars qw( $VERSION );
+
 use App::alios qw(:all);
 
 use File::Find;
@@ -24,14 +26,14 @@ sub version {
 }
 
 sub search {
-	my $app = init;
+	my $app = init();
 	for(@$app){
 		print " " x (length $_->{id}) . colored(['yellow'], "$_->{name}") . colored(['yellow'], "__") . colored(['black on_yellow'], " $_->{nr}") . "\n"; 
 	}
 }
 
 sub show {
-	my $apps = conf;
+	my $apps = conf();
 	print colored(['black on_yellow'], " alios "); for my $app(@$apps){ print " $app->{alios}" }; print " " . colored(['black on_yellow'], " ") . "\n";
 }
 
@@ -49,7 +51,7 @@ sub help {
 	. "\t'" . colored(['bold white'], "alios -d name") . "' delete alios\n\n";
 }
 
-if($opt->{m} and $opt->{n}){ $map->($opt->{m}, $opt->{n}) }
+if($opt->{m} and $opt->{n}){ mapp($opt->{m}, $opt->{n}) }
 elsif($opt->{s}){ search }
 elsif($opt->{p}){ conf(1) }
 elsif($opt->{d}){ del($opt->{d}) }
