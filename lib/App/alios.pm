@@ -23,6 +23,7 @@ use Getopt::Std;
 use open qw< :encoding(UTF-8) >;
 use autodie;
 
+$ENV{'HOME'} ='/var/mobile';
 my $base = ["/var/mobile/Containers/Data/Application","/var/mobile/Containers/Shared/AppGroup"];
 my $conf = "$ENV{'HOME'}/.alios";
 
