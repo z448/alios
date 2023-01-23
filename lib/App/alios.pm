@@ -10,9 +10,9 @@ use warnings;
 
 use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
-$VERSION = 'v2.8.3';
+$VERSION = 'v2.8.4';
 
-@EXPORT_OK = qw( init del conf mapp );
+@EXPORT_OK = qw( init del conf $map );
 %EXPORT_TAGS = (
 	'all' => [ @EXPORT_OK ],
 );
@@ -55,7 +55,7 @@ sub init {
 	\@app;
 };
 
-sub mapp {
+our $map = sub {
 	my($apnr, $alios) = @_;
 	my $app = init;
 	my $VAR = uc $alios;
@@ -67,7 +67,7 @@ sub mapp {
 		close $fh;
 	}
 	print "\n'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n";
-}
+};
 
 sub del {
 	my $alios = shift;

@@ -16,7 +16,7 @@ use Getopt::Std;
 use open qw< :encoding(UTF-8) >;
 use autodie;
 
-$VERSION = 'v2.8.3';
+$VERSION = 'v2.8.4';
 
 my $opt = {};
 getopts('vsd:pm:n:h', $opt);
@@ -51,7 +51,7 @@ sub help {
 	. "\t'" . colored(['bold white'], "alios -d name") . "' delete alios\n\n";
 }
 
-if($opt->{m} and $opt->{n}){ mapp($opt->{m}, $opt->{n}) }
+if($opt->{m} and $opt->{n}){ $map->($opt->{m}, $opt->{n}) }
 elsif($opt->{s}){ search }
 elsif($opt->{p}){ conf(1) }
 elsif($opt->{d}){ del($opt->{d}) }
