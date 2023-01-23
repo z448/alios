@@ -144,6 +144,9 @@ sub conf {
 	\@app;
 };
 
+=head1 NAME
+
+App::alios - tool for quick jumps into app folders
 
 =head1 SOURCE AVAILABILITY
 
