@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 2;
 BEGIN { use_ok('App::alios') };
 
 #########################
@@ -16,3 +16,9 @@ BEGIN { use_ok('App::alios') };
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
+my $expect_os = 'iPhone';
+
+my $os = `uname -a`;
+if($os =~ /iPhone/){ $os = 'iPhone' }
+
+ok( $os eq $expect_os, 'os_test' )
