@@ -10,7 +10,7 @@ use warnings;
 
 use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
-$VERSION = 'v2.8.4';
+$VERSION = 'v2.8.5';
 
 @EXPORT_OK = qw( init del conf $map );
 %EXPORT_TAGS = (
@@ -93,28 +93,29 @@ sub conf {
 	
 	my $heal = sub {
 		my $cfapps = shift;
-		my $apps = init;
-		
+		my $apps = init();
+		unlink($conf);
+
 		for my $cfapp(@$cfapps){
-			next if ($cfapp->{ill} != 1);
-			for my $app(@$apps){
-				our $^I = '.bak';
-				our @ARGV = ($conf);
-				if($app->{id} eq $cfapp->{id}){
-						while(<ARGV>){
-							chomp;
-							s/$cfapp->{conf}/$cfapp->{var}=$app->{path};alias $cfapp->{alios}=\"cd $app->{path}\";$cfapp->{alios}=$app->{id}/;
-							print "$_\n";
-	                			}
-				} else { unless(-e $app->{plist}){
-							while(<ARGV>){
-								chomp;
-								s/$cfapp->{conf}//;
-								print "$_\n";
-							}
+			if($cfapp->{ill} == 1){
+				for my $app(@$apps){
+					if($app->{id} eq $cfapp->{id}){
+						open(my $fh, '>>', $conf);
+						print $fh "$cfapp->{var}=$app->{path};alias $cfapp->{alios}=\"cd $app->{path}\";$cfapp->{alios}=$app->{id}\n";
+						close $fh;
 					}
 				}
 			}
+			if($cfapp->{ill} == 0){
+				for my $app(@$apps){
+					if($app->{id} eq $cfapp->{id}){
+						open(my $fh, '>>', $conf);
+						print $fh "$cfapp->{conf}\n";
+						close $fh;
+					}
+				}
+			}
+
 		}
 	};
 	
