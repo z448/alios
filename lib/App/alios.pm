@@ -25,6 +25,7 @@ use open qw< :encoding(UTF-8) >;
 use autodie;
 
 my $conf = "$ENV{'HOME'}/.alios";
+my $base = ["/var/mobile/Containers/Data/Application/", "/var/mobile/Containers/Shared/AppGroup/"];
 
 unless( -e $conf ){
 	open(my $fh, '>>', $conf);
@@ -35,7 +36,7 @@ sub init {
 	my %app = ();
 	my @app = ();
 	my $nr = 1;
-	my @plist = glob("/var/mobile/Containers/Data/Application/*/Library/Preferences/*.plist /var/mobile/Containers/Shared/AppGroup/*/Library/Preferences/*.plist");
+	my @plist = glob("$base->[0]/*/Library/Preferences/*.plist" "$base->[1]/*/Library/Preferences/*.plist");
 
 	for(@plist){
 		$app{plist} = $_;
@@ -144,7 +145,7 @@ sub conf {
 
 =head1 NAME
 
-App::alios - tool for quick jumps into app folders
+App::alios - tool for quick jumps into iOS app folders
 
 =head1 SOURCE AVAILABILITY
 
