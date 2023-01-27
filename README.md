@@ -1,6 +1,6 @@
 NAME
 
-alios - tool for quick jumps into app folders
+alios - tool for quick jumps into iOS app folders
 
 
 INSTALLATION
