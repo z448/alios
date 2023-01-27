@@ -91,8 +91,8 @@ sub conf {
 	
 	my $heal = sub {
 		my $cfapps = shift;
-		my $apps = init();
-		unlink($conf);
+		my $apps = init;
+		unlink $conf ;
 
 		for my $cfapp(@$cfapps){
 			if($cfapp->{ill} == 1){
