@@ -36,7 +36,7 @@ sub init {
 	my %app = ();
 	my @app = ();
 	my $nr = 1;
-	my @plist = glob("$base->[0]/*/Library/Preferences/*.plist" "$base->[1]/*/Library/Preferences/*.plist");
+	my @plist = glob("$base->[0]/*/Library/Preferences/*.plist $base->[1]/*/Library/Preferences/*.plist");
 
 	for(@plist){
 		$app{plist} = $_;
