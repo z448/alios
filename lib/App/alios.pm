@@ -10,7 +10,7 @@ use warnings;
 
 use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
-$VERSION = 'v2.8.5';
+$VERSION = 'v2.8.6';
 
 @EXPORT_OK = qw( init del conf $map );
 %EXPORT_TAGS = (
@@ -19,13 +19,11 @@ $VERSION = 'v2.8.5';
 
 use Exporter qw(import);
 
-use File::Find;
 use Term::ANSIColor;
 use Getopt::Std;
 use open qw< :encoding(UTF-8) >;
 use autodie;
 
-my $base = ["/var/mobile/Containers/Data/Application","/var/mobile/Containers/Shared/AppGroup"];
 my $conf = "$ENV{'HOME'}/.alios";
 
 unless( -e $conf ){
@@ -37,23 +35,22 @@ sub init {
 	my %app = ();
 	my @app = ();
 	my $nr = 1;
+	my @plist = glob("/var/mobile/Containers/Data/Application/*/Library/Preferences/*.plist /var/mobile/Containers/Shared/AppGroup/*/Library/Preferences/*.plist");
 
-	find( sub {
-		if("$File::Find::dir/$_" =~ /Library\/Preferences\/.*\.plist/){
-			$app{plist} = "$File::Find::dir/$_";
-			$app{plist} =~ /(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/;
-			$app{path} = $1.$2.$3;
-			$app{uuid} = $3;
-			$app{nr} = $nr;
-			$app{id} = $5;
-			my @appid = split(/\./, $app{id});
-			$app{name} = $appid[-1];
-			$nr++;
-			push @app,{%app};
-		}
-	}, @$base);
+	for(@plist){
+		$app{plist} = $_;
+		$app{plist} =~ /(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/;
+		$app{path} = $1.$2.$3;
+		$app{uuid} = $3;
+		$app{nr} = $nr;
+		$app{id} = $5;
+		my @appid = split(/\./, $app{id});
+		$app{name} = $appid[-1];
+		$nr++;
+		push @app,{%app};
+	}
 	\@app;
-};
+}
 
 our $map = sub {
 	my($apnr, $alios) = @_;
