@@ -16,9 +16,16 @@ BEGIN { use_ok('App::alios') };
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-my $expect_os = 'iPhone';
+use POSIX qw(uname);
 
-my $os = `uname -a`;
-if($os =~ /iPhone/){ $os = 'iPhone' }
+my $expect_os = 'iOS';
+my @uname = uname();
+my $os = '';
+
+for(@uname){
+	if(/iPhone/){ $os = 'iOS' }
+}
 
 ok( $os eq $expect_os, 'os_test' )
+
+
