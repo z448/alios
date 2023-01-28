@@ -39,6 +39,7 @@ sub init {
 	my @plist = glob("$base->[0]/*/Library/Preferences/*.plist $base->[1]/*/Library/Preferences/*.plist");
 
 	for(@plist){
+		next if (/measurment/);
 		$app{plist} = $_;
 		$app{plist} =~ /(.*)(\/App.*?\/)(.*?)(\/Library\/Preferences\/)(.*)(\.plist)/;
 		$app{path} = $1.$2.$3;
