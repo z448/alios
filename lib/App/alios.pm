@@ -65,7 +65,7 @@ our $map = sub {
 		print $fh "$VAR=$_->{path};alias $_->{alios}=\"cd $_->{path}\";$_->{alios}=$_->{id}\n";
 		close $fh;
 	}
-	print "\n'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n";
+	print "'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n";
 };
 
 sub del {
@@ -85,7 +85,7 @@ sub del {
 		close $fh;
 	}
 	
-	print "\nRestart shell session '" . colored(['bold white'], "exec \$SHELL") . "' to make changes available.\n";
+	print "Restart shell session '" . colored(['bold white'], "exec \$SHELL") . "' to make changes available.\n";
 };
 
 sub conf {
