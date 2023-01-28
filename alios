@@ -38,7 +38,7 @@ sub show {
 }
 
 sub help {
-	print "\n" . colored(['bold white'], "alios") . " - tool for quick jumps into iOS app folders\n"
+	print "\n" . colored(['bold white'], "alios") . " - CLI tool for quick jumps into iOS app folders\n"
 	. "\t" . colored(['bold white'], "-v") . " show version\n"
 	. "\t" . colored(['bold white'], "-s") . " search for available apps\n"
 	. "\t" . colored(['bold white'], "-m") . " map alios\n"
@@ -61,7 +61,7 @@ else { show };
 
 =head1 NAME
 
-alios - tool for quick jumps into iOS app folders 
+alios - CLI tool for quick jumps into iOS app folders 
 
 =head1 VERSION
 

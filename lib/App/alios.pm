@@ -60,7 +60,7 @@ our $map = sub {
 	for(@$app){
 		next if ($apnr != $_->{nr});
 		$_->{alios} = $alios;
-    		open(my $fh, ">>", $conf);
+    		open(my $fh, '>>', $conf);
 		print $fh "$VAR=$_->{path};alias $_->{alios}=\"cd $_->{path}\";$_->{alios}=$_->{id}\n";
 		close $fh;
 	}
@@ -119,7 +119,7 @@ sub conf {
 	
 	my $h = shift || 0;
 	my @app = ();
-	open(my $fh, "<", $conf);
+	open(my $fh, '<', $conf);
 	while(<$fh>){
 		my %app = ();
 		chomp;
@@ -145,7 +145,7 @@ sub conf {
 
 =head1 NAME
 
-App::alios - tool for quick jumps into iOS app folders
+App::alios - CLI tool for quick jumps into iOS app folders
 
 =head1 SOURCE AVAILABILITY
 
