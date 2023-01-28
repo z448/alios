@@ -40,12 +40,12 @@ sub show {
 sub help {
 	print "\n" . colored(['bold white'], "alios") . " - CLI tool for quick jumps into iOS app folders\n"
 	. "\t" . colored(['bold white'], "-v") . " show version\n"
-	. "\t" . colored(['bold white'], "-s") . " search for available apps\n"
+	. "\t" . colored(['bold white'], "-s") . " search for installed apps\n"
 	. "\t" . colored(['bold white'], "-m") . " map alios\n"
 	. "\t" . colored(['bold white'], "-d") . " delete mapped alios\n"
 	. "\t" . colored(['bold white'], "-h") . " show this help\n"
 	. colored(['bold white'], "E.g") . "\n"
-	. "\t'" . colored(['bold white'], "alios -s") . "' search for available apps\n"
+	. "\t'" . colored(['bold white'], "alios -s") . "' search for installed apps\n"
 	. "\t'" . colored(['bold white'], "alios -m 44 -n name") . "' map 44th app to name\n"
 	. "\t'" . colored(['bold white'], "alios") . "' list alios\n"
 	. "\t'" . colored(['bold white'], "alios -d name") . "' delete alios\n\n";
@@ -75,7 +75,7 @@ This document describes alios version $VERSION
 
 =item C<-p> repath  
 
-=item C<-s> search for available apps
+=item C<-s> search for installed apps
 
 =item C<-m> map alios
 
@@ -93,7 +93,7 @@ Creates shell variable '$APP' holding app home folder path, alias 'app' pointing
 
 C<alios -p> repath path to app home folders
 
-C<alios -s> search for available apps
+C<alios -s> search for installed apps
 
 C<alios -m 44 -n name> map 44th app to name
 
