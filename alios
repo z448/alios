@@ -33,7 +33,7 @@ sub search {
 }
 
 sub show {
-	my $apps = conf(1);
+	my $apps = conf();
 	print colored(['black on_yellow'], " alios "); for my $app(@$apps){ print " $app->{alios}" }; print " " . colored(['black on_yellow'], " ") . "\n";
 }
 
