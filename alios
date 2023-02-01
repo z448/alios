@@ -51,6 +51,7 @@ sub help {
 	. "\t'" . colored(['bold white'], "alios") . "' list alios\n"
 	. "\t'" . colored(['bold white'], "somename") . "' jump to somename app folder\n"
 	. "\t'" . colored(['bold white'], "find \$SOMENAME -name \'*.jpg\'") . "' find jpg files in somename app folder\n"
+	. "\t'" . colored(['bold white'], "open \$somename") . "' open somename app\n"
 	. "\t'" . colored(['bold white'], "alios -d name") . "' delete alios\n\n";
 }
 
@@ -105,6 +106,8 @@ C<alios -m 44 -n name> map 44th app to somename
 C<somename> jump to somename app folder
 
 C<find $SOMENAME -name '*jpg'> find jpg files in somename app folder
+
+C<open $somename> open somename app
 
 C<alios> list alioses
 
