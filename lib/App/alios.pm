@@ -65,7 +65,6 @@ our $map = sub {
 		print $fh "$VAR=$_->{path};alias $_->{alios}=\"cd $_->{path}\";$_->{alios}=$_->{id}\n";
 		close $fh;
 	}
-	print "'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n";
 };
 
 sub del {
@@ -84,8 +83,6 @@ sub del {
 		for my $app(@app){ print $fh $app; }
 		close $fh;
 	}
-	
-	print "Restart shell session '" . colored(['bold white'], "exec \$SHELL") . "' to make changes available.\n";
 };
 
 sub conf {
