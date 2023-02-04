@@ -48,7 +48,7 @@ sub help {
 	. "\t'" . colored(['bold white'], "alios -p") . "' repath the path to app home folders\n"
 	. "\t'" . colored(['bold white'], "alios -s") . "' search for installed apps\n"
 	. "\t'" . colored(['bold white'], "alios -m 44 -n somename") . "' map 44th app to somename\n"
-	. "\t'" . colored(['bold white'], "alios") . "' list alios\n"
+	. "\t'" . colored(['bold white'], "alios") . "' list alioses\n"
 	. "\t'" . colored(['bold white'], "somename") . "' jump to somename app folder\n"
 	. "\t'" . colored(['bold white'], "find \$SOMENAME -name \'*.jpg\'") . "' find jpg files in somename app folder\n"
 	. "\t'" . colored(['bold white'], "open \$somename") . "' open somename app\n"
