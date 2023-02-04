@@ -141,9 +141,15 @@ sub conf {
 	\@app;
 };
 
+=encoding utf8
+
 =head1 NAME
 
 App::alios - CLI tool for quick jumps into iOS app folders
+
+=head1 SYNOPSIS
+
+	use App::alios qw(:all);
 
 =head1 SOURCE AVAILABILITY
 
@@ -152,6 +158,8 @@ App::alios - CLI tool for quick jumps into iOS app folders
 =head1 AUTHOR
 
 Zdeněk Bohuněk, C<< <4zdenek@gmail.com> >>
+
+=head1 COPYRIGHT
 
 Copyright © 2016-2023, Zdeněk Bohuněk C<< <4zdenek@gmail.com> >>. All rights reserved. 
 

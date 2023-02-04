@@ -63,6 +63,8 @@ elsif($opt->{h}){ help }
 elsif($opt->{v}){ version }
 else { show };
 
+=encoding utf8
+
 =head1 NAME
 
 alios - CLI tool for quick jumps into iOS app folders 
@@ -93,8 +95,6 @@ This document describes alios version $VERSION
 
 Creates shell variable '$APP' holding app home folder path, alias 'app' pointing to app home folder and shell variable '$app' holding app id.
 
-=head1 DEVELOPMENT
-
 =head1 EXAMPLES
 
 C<alios -p> repath the path to app home folders
@@ -112,5 +112,19 @@ C<open $somename> open somename app
 C<alios> list alioses
 
 C<alios -d name> delete alios
+
+=head1 DEVELOPMENT
+
+alios is hosted on L<github|https://github.com/z448/alios>. You can track and contribute to its development there.
+
+=head1 AUTHOR
+
+Zdeněk Bohuněk, C<< <4zdenek@gmail.com> >>
+
+=head1 COPYRIGHT
+
+Copyright © 2016-2023, Zdeněk Bohuněk C<< <4zdenek@gmail.com> >>. All rights reserved. 
+
+This code is available under the Artistic License 2.0.
 
 =cut
