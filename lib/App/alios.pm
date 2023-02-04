@@ -25,7 +25,7 @@ use open qw< :encoding(UTF-8) >;
 use autodie;
 
 my $conf = "$ENV{'HOME'}/.alios";
-my $base = ["/var/mobile/Containers/Data/Application/", "/var/mobile/Containers/Shared/AppGroup/"];
+my $base = ["/var/mobile/Containers/Data/Application", "/var/mobile/Containers/Shared/AppGroup"];
 
 unless( -e $conf ){
 	open(my $fh, '>>', $conf);
