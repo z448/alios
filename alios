@@ -20,6 +20,11 @@ $VERSION = "v2.8.7";
 my $opt = {};
 getopts('vsd:pm:n:h', $opt);
 
+unless( -f "$ENV{HOME}/.alios" ){
+	open my $conf_fh, '>', "$ENV{HOME}/.alios";
+	close $conf_fh;
+}
+
 sub version {
 	print "$VERSION\n";
 }
