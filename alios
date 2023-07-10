@@ -55,6 +55,13 @@ sub help {
 	. "\t'" . colored(['bold white'], "alios -d name") . "' delete alios\n\n";
 }
 
+system(qq(touch "$ENV{HOME}/.alios"));
+#unless( -e "$ENV{HOME}/.alios" ){
+#	print "$ENV{HOME}/.alios\n";
+#	open my $conf_fh, ">", "$ENV{HOME}/.alios";
+#	close $conf_fh;
+#}
+
 if($opt->{m} and $opt->{n}){ $map->($opt->{m}, $opt->{n}); print "'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n" }
 elsif($opt->{s}){ search }
 elsif($opt->{p}){ conf(1) }
