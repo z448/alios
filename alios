@@ -57,7 +57,7 @@ sub help {
 
 if($opt->{m} and $opt->{n}){ $map->($opt->{m}, $opt->{n}); print "'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n" }
 elsif($opt->{s}){ search }
-elsif($opt->{p}){ conf(1) unless( -e "$ENV{HOME}/.alios") }
+elsif($opt->{p}){ conf(1) }
 elsif($opt->{d}){ del($opt->{d}) and print "Restart shell session '" . colored(['bold white'], "exec \$SHELL") . "' to make changes available.\n" }
 elsif($opt->{h}){ help }
 elsif($opt->{v}){ version }

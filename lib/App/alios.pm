@@ -7,6 +7,7 @@ package App::alios;
 
 use strict;
 use warnings;
+use autodie;
 
 use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
@@ -28,6 +29,7 @@ my $conf = "$ENV{'HOME'}/.alios";
 my $base = ["/var/mobile/Containers/Data/Application", "/var/mobile/Containers/Shared/AppGroup"];
 
 unless( -e $conf ){
+	#system("touch $conf");
 	open(my $fh, '>>', $conf);
 	close $fh;
 }
