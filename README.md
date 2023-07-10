@@ -17,8 +17,8 @@ perl Makefile.PL
 make
 sudo make install
 ```
-source alios from your ~/.bashrc file
+add following line to your ~/.bashrc file
 
 ```bash
-echo 'alios -p && source ~/.alios' >> ~/.bashrc
+alios -p && if [ -f ~/.alios ];then source ~/.alios; fi
 ```

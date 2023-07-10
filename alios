@@ -55,12 +55,6 @@ sub help {
 	. "\t'" . colored(['bold white'], "alios -d name") . "' delete alios\n\n";
 }
 
-system(qq(touch "$ENV{HOME}/.alios"));
-#unless( -e "$ENV{HOME}/.alios" ){
-#	print "$ENV{HOME}/.alios\n";
-#	open my $conf_fh, ">", "$ENV{HOME}/.alios";
-#	close $conf_fh;
-#}
 
 if($opt->{m} and $opt->{n}){ $map->($opt->{m}, $opt->{n}); print "'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n" }
 elsif($opt->{s}){ search }
@@ -119,6 +113,11 @@ C<open $somename> open somename app
 C<alios> list alioses
 
 C<alios -d name> delete alios
+
+Add following line to your ~/.bashrc file
+
+C<alios -p && if [ -f ~/.alios ];then source ~/.alios; fi>
+
 
 =head1 DEVELOPMENT
 

@@ -28,11 +28,6 @@ use autodie;
 my $conf = "$ENV{'HOME'}/.alios";
 my $base = ["/var/mobile/Containers/Data/Application", "/var/mobile/Containers/Shared/AppGroup"];
 
-unless( -e $conf ){
-	#system("touch $conf");
-	open(my $fh, '>>', $conf);
-	close $fh;
-}
 
 sub init {
 	my %app = ();
@@ -119,27 +114,30 @@ sub conf {
 	
 	my $h = shift || 0;
 	my @app = ();
-	open(my $fh, '<', $conf);
-	while(<$fh>){
-		my %app = ();
-		chomp;
-		($app{plist}, $app{alias}, $app{id}) = split(/;/, $_);
+
+	if( -e $conf ){
+		open(my $fh, '<', $conf);
+		while(<$fh>){
+			my %app = ();
+			chomp;
+			($app{plist}, $app{alias}, $app{id}) = split(/;/, $_);
 			
-		$app{conf} = $_;
-		$app{alias} =~ s/^(.*)\=.*\"(.*)\"/$1/;
-		$app{id} =~ s/.*\=(.*)/$1/;
-		$app{plist} =~ s/(.*)\=(.*)/$2\/Library\/Preferences\/$app{id}\.plist/;
-		$app{var} = $1;
-		$app{path} = "$app{plist}/../../..";
-		$app{alios} = lc $1;
-		my @appname = split(/\./, $app{id});
-		$app{name} = $appname[-1];
-		$app{ill} = 0;
-		$app{ill} = 1 unless -e $app{plist};
-		push @app, \%app;
+			$app{conf} = $_;
+			$app{alias} =~ s/^(.*)\=.*\"(.*)\"/$1/;
+			$app{id} =~ s/.*\=(.*)/$1/;
+			$app{plist} =~ s/(.*)\=(.*)/$2\/Library\/Preferences\/$app{id}\.plist/;
+			$app{var} = $1;
+			$app{path} = "$app{plist}/../../..";
+			$app{alios} = lc $1;
+			my @appname = split(/\./, $app{id});
+			$app{name} = $appname[-1];
+			$app{ill} = 0;
+			$app{ill} = 1 unless -e $app{plist};
+			push @app, \%app;
+		}
+		close $fh;
+		$heal->(\@app) if $h;
 	}
-	close $fh;
-	$heal->(\@app) if $h;
 	\@app;
 };
 
