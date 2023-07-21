@@ -1,6 +1,6 @@
 NAME
 
-alios - CLI tool for quick jumps into iOS app folders
+alios - tool for quick jumps into iOS app folders
 
 GIF
 

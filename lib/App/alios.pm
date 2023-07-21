@@ -145,7 +145,7 @@ sub conf {
 
 =head1 NAME
 
-App::alios - CLI tool for quick jumps into iOS app folders
+App::alios - tool for quick jumps into iOS app folders
 
 =head1 SYNOPSIS
 

@@ -68,7 +68,7 @@ else { show };
 
 =head1 NAME
 
-alios - CLI tool for quick jumps into iOS app folders 
+alios - tool for quick jumps into iOS app folders 
 
 =head1 VERSION
 
