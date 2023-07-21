@@ -3,5 +3,6 @@ LICENSE
 Makefile.PL
 MANIFEST
 README.md
+README
 t/App-alios.t
 lib/App/alios.pm
