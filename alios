@@ -15,7 +15,7 @@ use Getopt::Std;
 use open qw< :encoding(UTF-8) >;
 use autodie;
 
-$VERSION = "v2.8.8"; 
+$VERSION = "v2.8.9"; 
 
 my $opt = {};
 getopts('vsd:pm:n:h', $opt);
@@ -80,7 +80,7 @@ This document describes alios version 2.8.8
 
 =item C<-v> show version 
 
-=item C<-p> app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of shell session add following line to your ~/.bashrc file 'alios -p && if [ -f ~/.alios ];then source ~/.alios; fi' 
+=item C<-p> app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && if [ -f ~/.alios ];then source ~/.alios; fi' 
 
 =item C<-s> search for installed apps
 
