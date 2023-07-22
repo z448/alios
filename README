@@ -11,7 +11,7 @@ SYNOPSIS
     -v show version
 
     -p app folder names are changing, this option will update path in
-    ~/.alios config file. To have paths updated at the start of shell
+    ~/.alios config file. To have paths updated at the start of bash
     session add following line to your ~/.bashrc file 'alios -p && if [ -f
     ~/.alios ];then source ~/.alios; fi'
 
