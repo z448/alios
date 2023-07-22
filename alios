@@ -15,7 +15,7 @@ use Getopt::Std;
 use open qw< :encoding(UTF-8) >;
 use autodie;
 
-$VERSION = "v2.8.9"; 
+$VERSION = "v2.9"; 
 
 my $opt = {};
 getopts('vsd:pm:n:h', $opt);
@@ -72,25 +72,22 @@ alios - tool for quick jumps into iOS app folders
 
 =head1 VERSION
 
-This document describes alios version 2.8.8
+This document describes alios version 2.9
 
 =head1 SYNOPSIS
 
-=over 10
+C<-v> show version 
 
-=item C<-v> show version 
+C<-p> app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && if [ -f ~/.alios ];then source ~/.alios; fi' 
 
-=item C<-p> app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && if [ -f ~/.alios ];then source ~/.alios; fi' 
+C<-s> search for installed apps
 
-=item C<-s> search for installed apps
+C<-m> map alios
 
-=item C<-m> map alios
+C<-d> delete alios
 
-=item C<-d> delete alios
+C<-h> show help
 
-=item C<-h> show help
-
-=back
 
 =head1 DESCRIPTION
 
