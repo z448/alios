@@ -11,7 +11,7 @@ use autodie;
 
 use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
-$VERSION = 'v2.8.6';
+$VERSION = 'v2.8.7';
 
 @EXPORT_OK = qw( init del conf $map );
 %EXPORT_TAGS = (
@@ -145,7 +145,7 @@ sub conf {
 
 =head1 NAME
 
-App::alios - tool for quick jumps into iOS app folders
+App::alios - module for alios
 
 =head1 SYNOPSIS
 
@@ -157,11 +157,11 @@ App::alios - tool for quick jumps into iOS app folders
 
 =head1 AUTHOR
 
-Zdeněk Bohuněk, C<< <4zdenek@gmail.com> >>
+Zdeněk Bohuněk, C<< <zdenek@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2016-2023, Zdeněk Bohuněk C<< <4zdenek@gmail.com> >>. All rights reserved. 
+Copyright © 2016-2023, Zdeněk Bohuněk C<< <zdenek@cpan.org> >>. All rights reserved. 
 
 This code is available under the Artistic License 2.0.
 

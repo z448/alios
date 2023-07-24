@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes alios version 2.9
+    This document describes alios version 2.9.1
 
 SYNOPSIS
 
@@ -53,11 +53,11 @@ DEVELOPMENT
 
 AUTHOR
 
-    Zdeněk Bohuněk, <4zdenek@gmail.com>
+    Zdeněk Bohuněk, <zdenek@cpan.org>
 
 COPYRIGHT
 
-    Copyright © 2016-2023, Zdeněk Bohuněk <4zdenek@gmail.com>. All rights
+    Copyright © 2016-2023, Zdeněk Bohuněk <zdenek@cpan.org>. All rights
     reserved.
 
     This code is available under the Artistic License 2.0.

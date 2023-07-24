@@ -15,7 +15,7 @@ use Getopt::Std;
 use open qw< :encoding(UTF-8) >;
 use autodie;
 
-$VERSION = "v2.9"; 
+$VERSION = "v2.9.1"; 
 
 my $opt = {};
 getopts('vsd:pm:n:h', $opt);
@@ -72,7 +72,7 @@ alios - tool for quick jumps into iOS app folders
 
 =head1 VERSION
 
-This document describes alios version 2.9
+This document describes alios version 2.9.1
 
 =head1 SYNOPSIS
 
@@ -118,11 +118,11 @@ alios is hosted on L<github|https://github.com/z448/alios>. You can track and co
 
 =head1 AUTHOR
 
-Zdeněk Bohuněk, C<< <4zdenek@gmail.com> >>
+Zdeněk Bohuněk, C<< <zdenek@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2016-2023, Zdeněk Bohuněk C<< <4zdenek@gmail.com> >>. All rights reserved. 
+Copyright © 2016-2023, Zdeněk Bohuněk C<< <zdenek@cpan.org> >>. All rights reserved. 
 
 This code is available under the Artistic License 2.0.
 
