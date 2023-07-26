@@ -6,11 +6,13 @@ alios - tool for quick jumps into iOS app folders
 
 This document describes alios version 2.9.1
 
-#GIF
+# GIF
 
 ![alios](https://raw.githubusercontent.com/z448/alios/master/alios.gif)
 
 # INSTALLATION
+
+Clone, build and installl.
 
 ```bash
 git clone https://github.com/z448/alios
@@ -19,6 +21,13 @@ perl Makefile.PL
 make
 make install
 ```
+
+Add following line to your ~/.profile or ~/.bashrc file.
+
+```bash
+alios -p && if [ -f ~/.alios ];then source ~/.alios; fi
+```
+
 
 # SYNOPSIS
 
