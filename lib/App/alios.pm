@@ -11,7 +11,7 @@ use autodie;
 
 use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
-$VERSION = 'v2.8.8';
+$VERSION = 'v2.8.9';
 
 @EXPORT_OK = qw( init del conf $map );
 %EXPORT_TAGS = (
@@ -53,6 +53,8 @@ sub init {
 
 our $map = sub {
 	my($apnr, $alios) = @_;
+    exit unless int $apnr;
+
 	my $app = init;
 	my $VAR = uc $alios;
 	for(@$app){
