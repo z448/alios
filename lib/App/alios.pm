@@ -11,7 +11,7 @@ use autodie;
 
 use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
-$VERSION = 'v2.8.7';
+$VERSION = 'v2.8.8';
 
 @EXPORT_OK = qw( init del conf $map );
 %EXPORT_TAGS = (
@@ -137,7 +137,11 @@ sub conf {
 		}
 		close $fh;
 		$heal->(\@app) if $h;
-	}
+	} else {
+        open(my $fh, '>', $conf);
+        close $fh;
+    }
+
 	\@app;
 };
 
