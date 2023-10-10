@@ -78,7 +78,7 @@ This document describes alios version 2.9.1
 
 C<-v> show version 
 
-C<-p> app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && if [ -f ~/.alios ];then source ~/.alios; fi' 
+C<-p> app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && source ~/.alios'.
 
 C<-s> search for installed apps
 

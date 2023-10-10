@@ -25,7 +25,7 @@ make install
 Add following line to your ~/.profile or ~/.bashrc file.
 
 ```bash
-alios -p && if [ -f ~/.alios ];then source ~/.alios; fi
+alios -p && source ~/.alios
 ```
 
 
@@ -33,7 +33,7 @@ alios -p && if [ -f ~/.alios ];then source ~/.alios; fi
 
 `-v` show version 
 
-`-p` app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && if \[ -f ~/.alios \];then source ~/.alios; fi' 
+`-p` app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && source ~/.alios'.
 
 `-s` search for installed apps
 
