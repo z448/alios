@@ -117,7 +117,7 @@ sub conf {
 	my $h = shift || 0;
 	my @app = ();
 
-	if( -e $conf ){
+	if( -e $conf and -s $conf != 0){
 		open(my $fh, '<', $conf);
 		while(<$fh>){
 			my %app = ();
