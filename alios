@@ -50,7 +50,7 @@ sub help {
 	. "\t'" . colored(['bold white'], "alios -p") . "' repath the path to app home folders\n"
 	. "\t'" . colored(['bold white'], "alios -s") . "' search for installed apps\n"
 	. "\t'" . colored(['bold white'], "alios -m 44") . "' map 44th app to app name\n"
-	. "\t'" . colored(['bold white'], "alios -m 44 -n customAppName") . "' map 44th app to customAppName\n"
+	. "\t'" . colored(['bold white'], "alios -m 44 -n customAppName") . "' map 44th app to custom name\n"
 	. "\t'" . colored(['bold white'], "alios") . "' list alioses\n"
 	. "\t'" . colored(['bold white'], "aliosName") . "' jump to app folder\n"
 	. "\t'" . colored(['bold white'], "find \$ALIOSNAME -name \'*.jpg\'") . "' find jpg files in app folder\n"
@@ -107,7 +107,7 @@ C<alios -s> search for installed apps
 
 C<alios -m 44> map 44th app to app name
 
-C<alios -m 44 -n customAppName> map 44th app to customAppName
+C<alios -m 44 -n customAppName> map 44th app to custom name
 
 C<alios> list alioses
 
