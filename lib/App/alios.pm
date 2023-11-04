@@ -11,7 +11,7 @@ use autodie;
 
 use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION );
 
-$VERSION = 'v2.8.9';
+$VERSION = 'v2.9';
 
 @EXPORT_OK = qw( init del conf $map );
 %EXPORT_TAGS = (
@@ -56,11 +56,12 @@ our $map = sub {
     exit unless int $apnr;
 
 	my $app = init;
-	my $VAR = uc $alios;
 	for(@$app){
 		next if ($apnr != $_->{nr});
-		$_->{alios} = $alios;
-    		open(my $fh, '>>', $conf);
+        $_->{alios} = $_->{name};
+		$_->{alios} = $alios if $alios;
+        my $VAR = uc $_->{alios};
+    	open(my $fh, '>>', $conf);
 		print $fh "$VAR=$_->{path};alias $_->{alios}=\"cd $_->{path}\";$_->{alios}=$_->{id}\n";
 		close $fh;
 	}
@@ -96,7 +97,7 @@ sub conf {
 				for my $app(@$apps){
 					if($app->{id} eq $cfapp->{id}){
 						open(my $fh, '>>', $conf);
-						print $fh "$cfapp->{var}=$app->{path};alias $cfapp->{alios}=\"cd $app->{path}\";$cfapp->{alios}=$app->{id}\n";
+                        print $fh "$cfapp->{var}=$app->{path};alias $cfapp->{alios}=\"cd $app->{path}\";$cfapp->{alios}=$app->{id}\n";
 						close $fh;
 					}
 				}
@@ -125,12 +126,12 @@ sub conf {
 			($app{plist}, $app{alias}, $app{id}) = split(/;/, $_);
 			
 			$app{conf} = $_;
-			$app{alias} =~ s/^(.*)\=.*\"(.*)\"/$1/;
+			$app{alias} =~ s/^alias (.*?)=.*/$1/;
 			$app{id} =~ s/.*\=(.*)/$1/;
 			$app{plist} =~ s/(.*)\=(.*)/$2\/Library\/Preferences\/$app{id}\.plist/;
 			$app{var} = $1;
 			$app{path} = "$app{plist}/../../..";
-			$app{alios} = lc $1;
+            $app{alios} = $app{alias};
 			my @appname = split(/\./, $app{id});
 			$app{name} = $appname[-1];
 			$app{ill} = 0;
