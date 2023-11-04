@@ -105,7 +105,7 @@ C<alios -p> repath the path to app home folders
 
 C<alios -s> search for installed apps
 
-C<alios -m 44>map 44th app to app name
+C<alios -m 44> map 44th app to app name
 
 C<alios -m 44 -n customAppName> map 44th app to customAppName
 
