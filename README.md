@@ -22,7 +22,7 @@ make
 make install
 ```
 
-Add following line to your ~/.profile or ~/.bashrc file.
+Add following line to your ~/.bashrc file.
 
 ```bash
 alios -p && source ~/.alios
