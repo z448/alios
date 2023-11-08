@@ -4,7 +4,7 @@ alios - tool for quick jumps into iOS app folders
 
 # VERSION
 
-This document describes alios version 2.9.1
+This document describes alios version 2.9.3
 
 # GIF
 
@@ -12,32 +12,26 @@ This document describes alios version 2.9.1
 
 # INSTALLATION
 
-Clone, build and installl.
-
-```bash
+ ```
 git clone https://github.com/z448/alios
 cd alios
 perl Makefile.PL
 make
 make install
+echo 'alios -p && source ~/.alios' >> /.bashrc
 ```
-
-Add following line to your ~/.bashrc file.
-
-```bash
-alios -p && source ~/.alios
-```
-
 
 # SYNOPSIS
 
 `-v` show version 
 
-`-p` app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && source ~/.alios'.
+`-p` update paths to app home folders in ~/.alios
 
 `-s` search for installed apps
 
-`-m` map alios
+`-m` map app number to alios
+
+`-n` custom alios name
 
 `-d` delete alios
 
@@ -45,25 +39,29 @@ alios -p && source ~/.alios
 
 # DESCRIPTION
 
-Creates shell variable '$APP' holding app home folder path, alias 'app' pointing to app home folder and shell variable '$app' holding app id.
+Writes ~/.alios file containing shell variable '$APP' holding app home folder path, alias 'app' pointing to app home folder and shell variable '$app' holding app id.
+
+App home folder paths are changing. To have paths updated at the start of bash session add following line to your ~/.bashrc file `alios -p && source ~/.alios`.
 
 # EXAMPLES
 
-`alios -p` repath the path to app home folders
+`alios -p` update paths to app home folders in ~/.alios
 
 `alios -s` search for installed apps
 
-`alios -m 44 -n name` map 44th app to somename
+`alios -m 44` map 44th app to app name
 
-`somename` jump to somename app folder
-
-`find $SOMENAME -name '*jpg'` find jpg files in somename app folder
-
-`open $somename` open somename app
+`alios -m 44 -n customAppName` map 44th app to custom name
 
 `alios` list alioses
 
-`alios -d name` delete alios
+`aliosName` jump to app folder
+
+`find $ALIOSNAME -name '*jpg'` find jpg files in app folder
+
+`open $aliosName` open app
+
+`alios -d aliosName` delete alios
 
 # DEVELOPMENT
 

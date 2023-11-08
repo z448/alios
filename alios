@@ -15,7 +15,7 @@ use Getopt::Std;
 use open qw< :encoding(UTF-8) >;
 use autodie;
 
-$VERSION = "v2.9.2"; 
+$VERSION = "v2.9.3"; 
 
 my $opt = {};
 getopts('vsd:pm:n:h', $opt);
@@ -82,7 +82,7 @@ This document describes alios version 2.9.1
 
 C<-v> show version 
 
-C<-p> app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && source ~/.alios'.
+C<-p> update paths to app home folders in ~/.alios
 
 C<-s> search for installed apps
 
@@ -97,11 +97,13 @@ C<-h> show help
 
 =head1 DESCRIPTION
 
-Creates shell variable '$APP' holding app home folder path, alias 'app' pointing to app home folder and shell variable '$app' holding app id.
+Writes ~/.alios file containing shell variable '$APP' holding app home folder path, alias 'app' pointing to app home folder and shell variable '$app' holding app id.
+
+App home folder paths are changing. To have paths updated at the start of bash session add following line to your ~/.bashrc file C<alios -p && source ~/.alios>.
 
 =head1 EXAMPLES
 
-C<alios -p> repath the path to app home folders
+C<alios -p> update paths to app home folders in ~/.alios
 
 C<alios -s> search for installed apps
 
