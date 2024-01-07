@@ -5,7 +5,7 @@ WriteMakefile(
     NAME              => 'App::alios',
     VERSION_FROM      => 'alios', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {}, # e.g., Module::Name => 1.1
-    ABSTRACT_FROM     => 'lib/App/alios.pm', # retrieve abstract from module
+    ABSTRACT_FROM     => 'alios', # retrieve abstract from module
     AUTHOR            => q{Zdenek Bohunek <zed448@icloud.com>},
     LICENSE           => 'artistic_2',
     'EXE_FILES'	      => ['alios'],
@@ -17,4 +17,5 @@ WriteMakefile(
 	    'Test::More' => 0,
     },
     dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
+    clean   => { FILES => 'App::alios-*' },
 );

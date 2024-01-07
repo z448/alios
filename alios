@@ -15,7 +15,7 @@ use Getopt::Std;
 use open qw< :encoding(UTF-8) >;
 use autodie;
 
-$VERSION = "v2.9.3"; 
+$VERSION = "v2.9"; 
 
 my $opt = {};
 getopts('vsd:pm:n:h', $opt);
@@ -33,8 +33,7 @@ sub search {
 
 sub show {
 	my $apps = conf();
-    #print colored(['black on_yellow'], " alios "); for my $app(@$apps){ print " $app->{name}" }; print " " . colored(['black on_yellow'], " ") . "\n";
-    print colored(['black on_yellow'], " alios "); for my $app(@$apps){ print " $app->{alios}" }; print " " . colored(['black on_yellow'], " ") . "\n";
+	print colored(['black on_yellow'], " alios "); for my $app(@$apps){ print " $app->{alios}" }; print " " . colored(['black on_yellow'], " ") . "\n";
 }
 
 sub help {
@@ -42,25 +41,22 @@ sub help {
 	. "\t" . colored(['bold white'], "-v") . " show version\n"
 	. "\t" . colored(['bold white'], "-p") . " repath\n"
 	. "\t" . colored(['bold white'], "-s") . " search for installed apps\n"
-	. "\t" . colored(['bold white'], "-m") . " map app number to alios\n"
-	. "\t" . colored(['bold white'], "-n") . " custom alios name\n"
+	. "\t" . colored(['bold white'], "-m") . " map alios\n"
 	. "\t" . colored(['bold white'], "-d") . " delete mapped alios\n"
 	. "\t" . colored(['bold white'], "-h") . " show this help\n\n"
 	. colored(['bold white'], "E.g") . "\n"
 	. "\t'" . colored(['bold white'], "alios -p") . "' repath the path to app home folders\n"
 	. "\t'" . colored(['bold white'], "alios -s") . "' search for installed apps\n"
-	. "\t'" . colored(['bold white'], "alios -m 44") . "' map 44th app to app name\n"
-	. "\t'" . colored(['bold white'], "alios -m 44 -n customAppName") . "' map 44th app to custom name\n"
+	. "\t'" . colored(['bold white'], "alios -m 44 -n somename") . "' map 44th app to somename\n"
 	. "\t'" . colored(['bold white'], "alios") . "' list alioses\n"
-	. "\t'" . colored(['bold white'], "aliosName") . "' jump to app folder\n"
-	. "\t'" . colored(['bold white'], "find \$ALIOSNAME -name \'*.jpg\'") . "' find jpg files in app folder\n"
-	. "\t'" . colored(['bold white'], "open \$aliosName") . "' open app\n"
-	. "\t'" . colored(['bold white'], "alios -d aliosName") . "' delete alios\n\n";
+	. "\t'" . colored(['bold white'], "somename") . "' jump to somename app folder\n"
+	. "\t'" . colored(['bold white'], "find \$SOMENAME -name \'*.jpg\'") . "' find jpg files in somename app folder\n"
+	. "\t'" . colored(['bold white'], "open \$somename") . "' open somename app\n"
+	. "\t'" . colored(['bold white'], "alios -d name") . "' delete alios\n\n";
 }
 
 
 if($opt->{m} and $opt->{n}){ $map->($opt->{m}, $opt->{n}); print "'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n" }
-elsif($opt->{m}){ $map->($opt->{m}); print "'" . colored(['bold white'], "source ~/.alios") . "' to make changes available.\n" }
 elsif($opt->{s}){ search }
 elsif($opt->{p}){ conf(1) }
 elsif($opt->{d}){ del($opt->{d}) and print "Restart shell session '" . colored(['bold white'], "exec \$SHELL") . "' to make changes available.\n" }
@@ -72,23 +68,21 @@ else { show };
 
 =head1 NAME
 
-alios - tool for quick jumps into iOS app folders 
+App::alios - tool for quick jumps into iOS app folders 
 
 =head1 VERSION
 
-This document describes alios version 2.9.1
+This document describes alios version 2.9
 
 =head1 SYNOPSIS
 
 C<-v> show version 
 
-C<-p> update paths to app home folders in ~/.alios
+C<-p> app folder names are changing, this option will update path in ~/.alios config file. To have paths updated at the start of bash session add following line to your ~/.bashrc file 'alios -p && if [ -f ~/.alios ];then source ~/.alios; fi' 
 
 C<-s> search for installed apps
 
-C<-m> map app number to alios
-
-C<-n> custom alios name
+C<-m> map alios
 
 C<-d> delete alios
 
@@ -97,29 +91,25 @@ C<-h> show help
 
 =head1 DESCRIPTION
 
-Writes ~/.alios file containing shell variable '$APP' holding app home folder path, alias 'app' pointing to app home folder and shell variable '$app' holding app id.
-
-App home folder paths are changing. To have paths updated at the start of bash session add following line to your ~/.bashrc file C<alios -p && source ~/.alios>.
+Creates shell variable '$APP' holding app home folder path, alias 'app' pointing to app home folder and shell variable '$app' holding app id.
 
 =head1 EXAMPLES
 
-C<alios -p> update paths to app home folders in ~/.alios
+C<alios -p> repath the path to app home folders
 
 C<alios -s> search for installed apps
 
-C<alios -m 44> map 44th app to app name
+C<alios -m 44 -n name> map 44th app to somename
 
-C<alios -m 44 -n customAppName> map 44th app to custom name
+C<somename> jump to somename app folder
+
+C<find $SOMENAME -name '*jpg'> find jpg files in somename app folder
+
+C<open $somename> open somename app
 
 C<alios> list alioses
 
-C<aliosName> jump to app folder
-
-C<find $ALIOSNAME -name '*jpg'> find jpg files in app folder
-
-C<open $aliosName> open app
-
-C<alios -d aliosName> delete alios
+C<alios -d name> delete alios
 
 
 =head1 DEVELOPMENT
@@ -128,11 +118,11 @@ alios is hosted on L<github|https://github.com/z448/alios>. You can track and co
 
 =head1 AUTHOR
 
-Zdeněk Bohuněk, C<< <zdenek@cpan.org> >>
+Zdeněk Bohuněk, C<< <4zdenek@gmail.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2016-2023, Zdeněk Bohuněk C<< <zdenek@cpan.org> >>. All rights reserved. 
+Copyright © 2016-2023, Zdeněk Bohuněk C<< <4zdenek@gmail.com> >>. All rights reserved. 
 
 This code is available under the Artistic License 2.0.
 
